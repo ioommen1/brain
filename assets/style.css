@@ -10,7 +10,7 @@
   --paper-opacity: 1;
   --chip: rgba(70, 55, 40, .055);
   --sans: "Inter", system-ui, -apple-system, sans-serif;
-  --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --serif: "Source Serif 4", "Iowan Old Style", Georgia, serif;
   --accent-wash: rgba(217, 98, 43, .16);
 }
 @media (prefers-color-scheme: dark) {
@@ -457,3 +457,9 @@ main > * { animation: fade .35s ease both; }
 a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color .35s ease, background-color .35s ease, border-color .35s ease, opacity .35s ease; }
 @media (prefers-reduced-motion: reduce) { .prose p::before, .prose h3::before { transition: none; } }
 @media (max-width: 640px) { .wide-hero { margin-left: -16px; margin-right: -16px; } .wide-hero .cover { aspect-ratio: 16 / 10; } .prose p::before, .prose h3::before { left: -10px; } }
+
+/* Lighter, bookish serif */
+.hero h1, .page-top h1, .article h1, .prose h3, .row .r-title, .i-title, .pt h3, .wide-hero .art .mark { font-weight: 300; font-optical-sizing: auto; }
+.hero h1 { letter-spacing: -0.02em; } .article h1, .page-top h1 { letter-spacing: -0.015em; }
+.prose h3 { letter-spacing: -0.01em; }
+.row .r-title, .i-title { font-weight: 400; font-size: 20px; }
