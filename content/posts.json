@@ -5,7 +5,17 @@
     "season": {
       "weeks": 12,
       "week": 1
-    }
+    },
+    "facts": [
+      [
+        "This week",
+        "Rabbit Hole, a feature for Spotify"
+      ],
+      [
+        "Focused on",
+        "Product, markets, and longevity"
+      ]
+    ]
   },
   "posts": [
     {

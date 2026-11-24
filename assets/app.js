@@ -53,43 +53,37 @@
       <span class="r-date mono">${shortDate(p.date)}</span>
     </a>`;
 
-  function seasonStrip() {
-    const S = site.season; if (!S) return "";
-    const cells = Array.from({ length: S.weeks }, (_, i) => {
-      const n = String(i + 1).padStart(2, "0");
-      const state = i < S.week ? "done" : i === S.week ? "up" : "";
-      return `<span class="wk ${state}" title="Week ${n}${state === "up" ? " · up next" : ""}"><i>${n}</i></span>`;
+  // Contact sheet of the season: finished weeks are big frames, the next one pulses, the rest wait.
+  function wall() {
+    const S = site.season || { weeks: 12 };
+    const byWeek = Object.fromEntries(posts.filter((p) => p.section === "concepts" && p.week).map((p) => [p.week, p]));
+    const done = Object.keys(byWeek).map(Number);
+    const next = (done.length ? Math.max(...done) : 0) + 1;
+    const frames = Array.from({ length: S.weeks }, (_, i) => {
+      const w = i + 1, n = String(w).padStart(2, "0"), p = byWeek[w];
+      if (p) return `<a class="frame done" href="#/concepts/${p.slug}">
+          <span class="shot">${cover(p)}<span class="view"><i></i>View concept</span></span>
+          <span class="cap">${esc(p.title)} <em>/ ${esc(p.app || (p.type === "product" ? "New product" : ""))}${p.app || p.type === "product" ? " · " : ""}Week ${n}</em></span>
+        </a>`;
+      return `<span class="frame ${w === next ? "up" : "later"}"><span class="shot"></span><span class="cap">${w === next ? `<i></i>Week ${n} <em>/ Up next</em>` : `<em>Week ${n}</em>`}</span></span>`;
     }).join("");
-    return `<div class="season">
-      <div class="season-head mono"><span>Week ${String(S.week).padStart(2, "0")} / ${S.weeks}</span></div>
-      <div class="weeks">${cells}</div>
-    </div>`;
+    return `<section class="sheet">${frames}</section>`;
   }
 
-  // keys: "" = everything (home), or a section key
+  // keys: "" = home, or a section key
   function index(key) {
-    const items = key ? posts.filter((p) => p.section === key) : posts;
-    const TYPES = [["feature", "Features"], ["product", "New products"]];
-    const groups = key === "concepts"
-      ? [["", "All"], ...TYPES]
-      : key
-      ? [["", "All"], ...[...new Set(items.flatMap((p) => p.tags || []))].map((t) => [t, t])]
-      : [["", "All"], ...Object.keys(SECTIONS).map((k) => [k, SECTIONS[k].title])];
-    const match = (p, g) => !g || (key === "concepts" ? p.type === g : key ? (p.tags || []).includes(g) : p.section === g);
-    const count = (g) => items.filter((p) => match(p, g)).length;
-    const head = key
-      ? `<section class="page-top${key === "concepts" ? " with-season" : ""}"><h1>${esc(SECTIONS[key].blurb || SECTIONS[key].title)}</h1>${key === "concepts" ? seasonStrip() : ""}</section>`
-      : `<section class="hero"><h1>${site.headline}</h1></section>`;
-    app.innerHTML = `${head}
-      <section class="index">
-        <div class="filters mono">${groups.map(([g, label], i) => `<button class="${i ? "" : "on"}" data-g="${esc(g)}">${esc(label)}</button>`).join("")}</div>
-        <div class="rows" id="list">${items.map(row).join("")}</div>
-      </section>`;
-    app.querySelectorAll(".filters button").forEach((b) => b.addEventListener("click", () => {
-      app.querySelectorAll(".filters button").forEach((x) => x.classList.toggle("on", x === b));
-      const g = b.dataset.g;
-      document.getElementById("list").innerHTML = items.filter((p) => match(p, g)).map(row).join("");
-    }));
+    if (key === "concepts") {
+      app.innerHTML = `<section class="page-top"><h1>${esc(SECTIONS.concepts.blurb)}</h1></section>${wall()}`;
+      return;
+    }
+    const items = key ? posts.filter((p) => p.section === key) : posts.filter((p) => p.section !== "concepts");
+    const facts = (site.facts || []).map(([k, v]) => `<div><span>${esc(k)}</span><strong>${v}</strong></div>`).join("");
+    app.innerHTML = key
+      ? `<section class="page-top"><h1>${esc(SECTIONS[key].blurb || SECTIONS[key].title)}</h1></section>
+         <div class="rows" id="list">${items.map(row).join("")}</div>`
+      : `<section class="hero"><h1>${site.headline}</h1>${facts ? `<div class="facts home-facts">${facts}</div>` : ""}</section>
+         ${wall()}
+         ${items.length ? `<section class="writing"><div class="label">Latest writing</div><div class="rows" id="list">${items.map(row).join("")}</div></section>` : ""}`;
   }
 
   // Floating cover preview that follows the cursor over index rows (desktop)
@@ -121,7 +115,6 @@
     app.innerHTML = `<nav class="crumb"><a href="#/${key}">← ${SECTIONS[key].title}</a><span>/</span><strong>${esc(p.title)}</strong></nav>
     ${hero ? `<div class="wide-hero"><div class="cover">${cover(p)}</div></div>` : ""}
     <div class="article-layout">
-    <aside class="toc" aria-label="On this page"></aside>
     <article class="article" id="top">
       <h1>${esc(p.title)}</h1>
       <div class="facts">${[
@@ -141,9 +134,12 @@
   }
 
   // ---------- Sidebar table of contents with scroll-spy ----------
+  let spyFn = null;
+  function clearToc() { const t = document.getElementById("side-toc"); if (t) t.innerHTML = ""; if (spyFn) removeEventListener("scroll", spyFn); spyFn = null; }
   function buildToc() {
-    const toc = app.querySelector(".toc"); const heads = [...app.querySelectorAll(".prose h2")];
-    if (!toc || heads.length < 2) { toc && toc.remove(); app.querySelector(".article-layout")?.classList.add("no-toc"); return; }
+    const toc = document.getElementById("side-toc"); const heads = [...app.querySelectorAll(".prose h2")];
+    if (!toc || heads.length < 2) return;
+    const host = document.querySelector(".nav a.active"); if (host) host.after(toc);
     const own = heads[0].textContent.trim().toLowerCase() === "overview";
     const targets = own ? heads : [app.querySelector("#top"), ...heads];
     toc.innerHTML = targets.map((h, i) => `<button type="button" data-t="${i}">${!own && !i ? "Overview" : esc(h.textContent)}</button>`).join("");
@@ -154,13 +150,12 @@
       scrollTo({ top: Math.max(0, y), behavior: still ? "auto" : "smooth" });
     }));
     const spy = () => {
-      if (!toc.isConnected) return removeEventListener("scroll", spy);
       const line = Math.min(innerHeight * 0.3, 160); let cur = 0;
       heads.forEach((h, i) => { if (h.getBoundingClientRect().top < line) cur = own ? i : i + 1; });
       if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) cur = targets.length - 1;
       btns.forEach((b, i) => b.classList.toggle("on", i === cur));
     };
-    addEventListener("scroll", spy, { passive: true }); spy();
+    spyFn = spy; addEventListener("scroll", spy, { passive: true }); spy();
   }
 
   // ---------- Shelf: a real bookshelf ----------
@@ -282,6 +277,7 @@
     const [, key, slug] = (location.hash.replace(/^#/, "") || "/").split("/");
     const active = key || "";
     document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("active", a.dataset.nav === active));
+    clearToc();
     if (!key) index("");
     else if (key === "about") about();
     else if (key === "shelf") shelf();
