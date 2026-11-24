@@ -600,3 +600,9 @@ a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color 
 /* Ink illustration covers sit on cream paper, so text is dark */
 .art.live.ink { background: #efe9dc; color: #2b2a27; }
 .art.live.ink .kicker { opacity: .6; }
+
+/* Name: quiet, in line with the nav */
+.brand { font-size: 14.5px !important; font-weight: 400 !important; color: var(--muted) !important; letter-spacing: 0 !important; transition: color .35s ease; }
+.brand:hover { color: var(--fg) !important; }
+@media (min-width: 1000px) { .brand { padding-left: 14px; } .site-header { gap: 18px; } }
+@media (max-width: 999px) { .brand { font-size: 14px !important; } }
