@@ -119,19 +119,21 @@
       ? `<div class="memo-box">${Object.entries(p.memo).map(([k, v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`
       : "";
     const hero = SECTIONS[key].layout === "gallery" ? `<div class="hero"><div class="cover">${cover(p)}</div></div>` : "";
+    const ownOverview = /^\s*##\s+overview/i.test(md);
     app.innerHTML = `<nav class="crumb"><a href="#/${key}">← ${SECTIONS[key].title}</a><span>/</span><strong>${esc(p.title)}</strong></nav>
+    ${hero ? `<div class="wide-hero"><div class="cover">${cover(p)}</div></div>` : ""}
     <div class="article-layout">
     <aside class="toc" aria-label="On this page"></aside>
     <article class="article" id="top">
+      <h1>${esc(p.title)}</h1>
       <div class="facts">${[
         p.week ? ["Week", String(p.week).padStart(2, "0") + " · " + new Date(p.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })] : ["Date", fmtDate(p.date)],
         typeLabel(p) ? ["Type", typeLabel(p)] : p.ticker ? ["Ticker", p.ticker] : null,
         p.scope ? ["Scope", p.scope] : p.status ? ["Status", p.status] : null,
         p.collaborators ? ["Collaborators", p.collaborators] : null,
       ].filter(Boolean).map(([k, v]) => `<div><span>${k}</span>${(Array.isArray(v) ? v : [v]).map((x) => `<strong>${esc(x)}</strong>`).join("")}</div>`).join("")}</div>
-      <h1>${esc(p.title)}</h1>
-      <p class="lede">${esc(p.summary)}</p>
-      ${hero}${memo}
+      ${ownOverview ? "" : `<p class="lede">${esc(p.summary)}</p>`}
+      ${memo}
       <div class="prose">${marked.parse(md)}</div>
       ${p.type === "feature" && p.app ? `<p class="disclaimer">A personal concept. Not affiliated with or endorsed by ${esc(p.app)}.</p>` : ""}
       ${key === "memos" ? `<p class="disclaimer">These are personal views for discussion only and are not investment advice. I may hold positions in securities mentioned.</p>` : ""}

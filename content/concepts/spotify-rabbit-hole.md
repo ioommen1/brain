@@ -1,6 +1,8 @@
 ## Overview
 
-Spotify is where most of my music lives. It knows my taste well, sometimes too well. It's great at giving me more of what I already like, and surprisingly bad at helping me find something new.
+### Spotify knows my taste. Maybe a little too well.
+
+It's where most of my music lives. It's great at giving me more of what I already like, and surprisingly bad at helping me find something new.
 
 ## Problem
 

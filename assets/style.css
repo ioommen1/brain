@@ -7,17 +7,19 @@
   --accent-text: #d9622b;
   --card: #f0eee9;
   --on-accent: #ffffff;
-  --paper-opacity: .55;
+  --paper-opacity: 1;
   --chip: rgba(70, 55, 40, .055);
   --sans: "Inter", system-ui, -apple-system, sans-serif;
+  --serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --accent-wash: rgba(217, 98, 43, .16);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #161615; --fg: #e4e2dd; --muted: #8b8984; --faint: #2c2b29; --accent: #ec7a45; --accent-text: #ec7a45; --card: #22211f; --paper-opacity: .35; --chip: rgba(255,255,255,.07);
+    --bg: #161615; --fg: #e4e2dd; --muted: #8b8984; --faint: #2c2b29; --accent: #ec7a45; --accent-text: #ec7a45; --card: #22211f; --paper-opacity: .5; --chip: rgba(255,255,255,.07);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #161615; --fg: #e4e2dd; --muted: #8b8984; --faint: #2c2b29; --accent: #ec7a45; --accent-text: #ec7a45; --card: #22211f; --paper-opacity: .35; --chip: rgba(255,255,255,.07);
+  --bg: #161615; --fg: #e4e2dd; --muted: #8b8984; --faint: #2c2b29; --accent: #ec7a45; --accent-text: #ec7a45; --card: #22211f; --paper-opacity: .5; --chip: rgba(255,255,255,.07);
 }
 
 * { box-sizing: border-box; }
@@ -31,7 +33,7 @@ body {
 body::before {
   content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: var(--paper-opacity);
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.3 0 0 0 0 0.24 0 0 0 0.16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.3 0 0 0 0 0.24 0 0 0 0.3 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.04 0.09' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.35 0 0 0 0 0.28 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23w)'/%3E%3C/svg%3E"),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000' preserveAspectRatio='none'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.004' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.47 0 0 0 0 0.36 0 0 0 0.22 -0.06'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
   background-size: 180px 180px, 300px 300px, cover;
@@ -407,3 +409,47 @@ main > * { animation: fade .35s ease both; }
 .prose h3 { font-size: 20px; font-weight: 500; letter-spacing: -0.015em; line-height: 1.35; color: var(--fg); margin: 30px 0 8px; text-wrap: balance; }
 .prose h4 { font-size: 13px; font-weight: 500; color: var(--accent-text); margin: 44px 0 -22px; letter-spacing: .01em; }
 .prose h4 + h3 { margin-top: 26px; }
+
+/* ================= Editorial pass ================= */
+/* Serif for titles and statements; small quiet sans for everything else */
+.hero h1, .page-top h1, .article h1 { font-family: var(--serif); font-weight: 400; letter-spacing: -0.01em; }
+.hero h1 { font-size: clamp(32px, 5vw, 52px); line-height: 1.1; }
+.page-top h1 { font-size: clamp(28px, 3.8vw, 40px); line-height: 1.15; }
+.article h1 { font-size: clamp(32px, 4.6vw, 44px); line-height: 1.12; margin: 0 0 28px; }
+.row .r-title, .i-title { font-family: var(--serif); font-size: 21px; letter-spacing: 0; }
+.pt h3 { font-family: var(--serif); font-weight: 400; font-size: 26px; letter-spacing: 0; }
+
+.prose { font-size: 15.5px; line-height: 1.7; color: color-mix(in srgb, var(--fg) 78%, var(--bg)); }
+.prose h2 { font-family: var(--sans); font-size: 13px; font-weight: 400; letter-spacing: .01em; color: var(--muted); margin: 64px 0 10px; padding-top: 28px; border-top: 1px solid var(--faint); }
+.prose h2:first-child { margin-top: 0; }
+.prose h3 { font-family: var(--serif); font-weight: 400; font-size: clamp(21px, 2.4vw, 26px); line-height: 1.3; letter-spacing: -0.005em; color: var(--fg); margin: 22px 0 10px; }
+.prose h2 + h3 { margin-top: 4px; }
+.prose h4 { font-size: 12.5px; font-weight: 400; margin: 40px 0 -16px; }
+.prose strong { color: var(--fg); font-weight: 500; }
+
+/* Wide hero above the title */
+.wide-hero { margin: 8px 0 44px; }
+.wide-hero .cover { position: relative; overflow: hidden; aspect-ratio: 21 / 9; background: var(--card); }
+.wide-hero .art { padding: clamp(18px, 3vw, 36px); }
+.wide-hero .art .mark { font-family: var(--serif); font-weight: 400; font-size: clamp(30px, 5vw, 60px); letter-spacing: -0.01em; }
+.wide-hero img { width: 100%; height: 100%; object-fit: cover; }
+.wide-hero .cover::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.55'/%3E%3C/svg%3E"); }
+.facts { border-top: 0; padding-top: 0; margin: 0 0 40px; padding-bottom: 28px; }
+.facts strong { font-size: 14px; }
+.crumb { margin-bottom: 18px; }
+
+/* Selection: orange ink on a soft orange wash */
+::selection { background: var(--accent-wash); color: var(--accent-text); }
+
+/* Hover: a thin orange bar eases in beside the paragraph you're reading */
+.prose p, .prose li, .prose h3 { position: relative; transition: color .45s ease; }
+.prose p::before, .prose h3::before { content: ""; position: absolute; left: -20px; top: .35em; bottom: .35em; width: 2px; background: var(--accent);
+  transform: scaleY(0); transform-origin: top; opacity: 0; transition: transform .45s cubic-bezier(.2,.8,.2,1), opacity .45s ease; }
+.prose p:hover::before, .prose h3:hover::before { transform: scaleY(1); opacity: 1; }
+.prose p:hover { color: var(--fg); }
+
+/* Everything eases instead of snapping */
+a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color .35s ease, background-color .35s ease, border-color .35s ease, opacity .35s ease; }
+@media (prefers-reduced-motion: reduce) { .prose p::before, .prose h3::before { transition: none; } }
+@media (max-width: 640px) { .wide-hero { margin-left: -16px; margin-right: -16px; } .wide-hero .cover { aspect-ratio: 16 / 10; } .prose p::before, .prose h3::before { left: -10px; } }
