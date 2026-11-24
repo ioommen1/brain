@@ -7,6 +7,8 @@ A minimal static site for product concepts, thoughts, and investment memos. No b
 1. Write a Markdown file in `content/concepts/`, `content/thoughts/`, or `content/memos/`.
 2. Add an entry to `content/posts.json` with the same `section` and `slug` (the file name without `.md`).
 
+Concepts also take `type` (`"feature"` with `"app": "Spotify"`, or `"product"`).
+
 Optional fields: `subtitle` (gray line under a card), `cover` (path to an image, e.g. `content/img/foo.jpg`; without one a colored cover is generated), `mark` (big text on the generated cover), `palette` (0 to 5, picks the generated cover color), `status` (concepts), `ticker` and `memo` (a key/value box shown at the top of memos), `tags` (become the filter chips), `readTime`.
 
 ## Preview locally

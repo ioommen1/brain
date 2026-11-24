@@ -2,7 +2,7 @@
 (function () {
   const app = document.getElementById("app");
   const SECTIONS = {
-    concepts: { title: "Concepts", layout: "gallery", blurb: "Small problems I noticed, and the products I'd build to fix them." },
+    concepts: { title: "Concepts", layout: "gallery", blurb: "A feature for an app I use, or a new product. One a week." },
     thoughts: { title: "Thoughts", layout: "notes", blurb: "Short notes on products, markets, and what I'm learning." },
     memos: { title: "Memos", layout: "gallery", blurb: "How I'd underwrite a company: thesis, risks, and what it's worth." },
   };
@@ -33,7 +33,7 @@
     if (p.cover) return `<img src="${esc(p.cover)}" alt="" loading="lazy">`;
     const h = hash(p.slug);
     const [a, b] = PALETTE[p.palette ?? h % PALETTE.length];
-    const kicker = `No. ${p.no}` + ((p.ticker || p.status) ? ` · ${p.ticker || p.status}` : "");
+    const kicker = typeLabel(p) || p.ticker || p.status || "";
     return `<div class="art" style="background:linear-gradient(160deg, ${a} 0%, ${b} 140%)">
       <span class="orb" style="width:60%;aspect-ratio:1;background:${b};right:-${10 + (h % 20)}%;top:${15 + (h % 30)}%"></span>
       <span class="kicker" style="position:relative">${esc(kicker)}</span>
@@ -43,6 +43,7 @@
 
   const LETTER = { concepts: "C", thoughts: "T", memos: "M" };
   const KIND = { concepts: "Concept", thoughts: "Thought", memos: "Memo" };
+  const typeLabel = (p) => p.type === "feature" ? `Feature${p.app ? ` · ${p.app}` : ""}` : p.type === "product" ? "New product" : "";
   const code = (p) => `${LETTER[p.section]}–${p.no}`;
   const shortDate = (d) => new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
@@ -50,7 +51,7 @@
       <span class="r-no mono">${code(p)}</span>
       <span class="r-thumb">${cover(p)}</span>
       <span class="r-main"><span class="r-title">${esc(p.title)}</span><span class="r-sum">${esc(p.summary)}</span></span>
-      <span class="r-kind mono">${esc(p.ticker || p.status || KIND[p.section])}</span>
+      <span class="r-kind mono">${esc(typeLabel(p) || p.ticker || p.status || KIND[p.section])}</span>
       <span class="r-date mono">${shortDate(p.date)}</span>
     </a>`;
 
@@ -62,19 +63,22 @@
       return `<span class="wk ${state}" title="Week ${n}${state === "up" ? " · up next" : ""}"><i>${n}</i></span>`;
     }).join("");
     return `<div class="season">
-      <div class="season-head mono"><span>${esc(S.label)} · ${esc(S.theme)}</span><span>Week ${String(S.week).padStart(2, "0")} / ${S.weeks}</span></div>
+      <div class="season-head mono"><span>Week ${String(S.week).padStart(2, "0")} / ${S.weeks}</span></div>
       <div class="weeks">${cells}</div>
-      ${site.now ? `<p class="now"><span class="dot"></span>${site.now}</p>` : ""}
     </div>`;
   }
 
   // keys: "" = everything (home), or a section key
   function index(key) {
     const items = key ? posts.filter((p) => p.section === key) : posts;
-    const groups = key
+    const TYPES = [["feature", "Features"], ["product", "New products"]];
+    const groups = key === "concepts"
+      ? [["", "All"], ...TYPES]
+      : key
       ? [["", "All"], ...[...new Set(items.flatMap((p) => p.tags || []))].map((t) => [t, t])]
       : [["", "All"], ...Object.keys(SECTIONS).map((k) => [k, SECTIONS[k].title])];
-    const count = (g) => !g ? items.length : items.filter((p) => key ? (p.tags || []).includes(g) : p.section === g).length;
+    const match = (p, g) => !g || (key === "concepts" ? p.type === g : key ? (p.tags || []).includes(g) : p.section === g);
+    const count = (g) => items.filter((p) => match(p, g)).length;
     const head = key
       ? `<section class="page-top${key === "concepts" ? " with-season" : ""}"><h1>${esc(SECTIONS[key].blurb || SECTIONS[key].title)}</h1>${key === "concepts" ? seasonStrip() : ""}</section>`
       : `<section class="hero"><h1>${site.headline}</h1></section>`;
@@ -86,7 +90,7 @@
     app.querySelectorAll(".filters button").forEach((b) => b.addEventListener("click", () => {
       app.querySelectorAll(".filters button").forEach((x) => x.classList.toggle("on", x === b));
       const g = b.dataset.g;
-      document.getElementById("list").innerHTML = items.filter((p) => !g || (key ? (p.tags || []).includes(g) : p.section === g)).map(row).join("");
+      document.getElementById("list").innerHTML = items.filter((p) => match(p, g)).map(row).join("");
     }));
   }
 
@@ -119,7 +123,7 @@
     <div class="article-layout">
     <aside class="toc" aria-label="On this page"></aside>
     <article class="article" id="top">
-      <div class="spec mono"><span><b>Entry</b>${code(p)}</span><span><b>Filed</b>${shortDate(p.date)}</span>${(p.status || p.ticker) ? `<span><b>${p.ticker ? "Ticker" : "Status"}</b>${esc(p.status || p.ticker)}</span>` : ""}${p.readTime ? `<span><b>Read</b>${esc(p.readTime)}</span>` : ""}</div>
+      <div class="spec mono"><span><b>Entry</b>${code(p)}</span><span><b>Filed</b>${shortDate(p.date)}</span>${typeLabel(p) ? `<span><b>Type</b>${esc(typeLabel(p))}</span>` : ""}${(p.status || p.ticker) ? `<span><b>${p.ticker ? "Ticker" : "Status"}</b>${esc(p.status || p.ticker)}</span>` : ""}${p.readTime ? `<span><b>Read</b>${esc(p.readTime)}</span>` : ""}</div>
       <h1>${esc(p.title)}</h1>
       <p class="lede">${esc(p.summary)}</p>
       ${hero}${memo}

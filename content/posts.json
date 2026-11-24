@@ -2,10 +2,7 @@
   "site": {
     "headline": "I'm Isaac. I notice small problems, design my way through them, and tell the story of what I find.",
     "intro": [],
-    "now": "Season 01 starts soon.",
     "season": {
-      "label": "Season 01",
-      "theme": "Longevity",
       "weeks": 12,
       "week": 0
     }
@@ -25,7 +22,8 @@
       "summary": "A single inbox that turns every purchase into a structured, searchable record for warranties, returns, and budgeting.",
       "subtitle": "Concept · Consumer fintech",
       "mark": "Every receipt, one place.",
-      "palette": 0
+      "palette": 0,
+      "type": "product"
     },
     {
       "section": "concepts",
@@ -38,10 +36,12 @@
         "B2B"
       ],
       "readTime": "6 min read",
-      "summary": "What if a 10-person company had the operating rhythm of a 1,000-person one, without hiring an ops team?",
+      "summary": "A teammate inside Slack that tracks decisions, nudges owners, and writes the weekly recap.",
       "subtitle": "Concept · AI for small teams",
       "mark": "Ops for a team of ten.",
-      "palette": 1
+      "palette": 1,
+      "type": "feature",
+      "app": "Slack"
     },
     {
       "section": "thoughts",
