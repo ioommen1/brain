@@ -128,6 +128,7 @@
       <p class="lede">${esc(p.summary)}</p>
       ${hero}${memo}
       <div class="prose">${marked.parse(md)}</div>
+      ${p.type === "feature" && p.app ? `<p class="disclaimer">A personal concept. Not affiliated with or endorsed by ${esc(p.app)}.</p>` : ""}
       ${key === "memos" ? `<p class="disclaimer">These are personal views for discussion only and are not investment advice. I may hold positions in securities mentioned.</p>` : ""}
     </article></div>`;
     window.scrollTo(0, 0);

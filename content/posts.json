@@ -4,44 +4,21 @@
     "intro": [],
     "season": {
       "weeks": 12,
-      "week": 0
+      "week": 1
     }
   },
   "posts": [
     {
       "section": "concepts",
-      "slug": "receipts-for-everything",
-      "title": "Receipts for Everything",
-      "date": "2026-11-10",
-      "status": "Exploring",
-      "tags": [
-        "Consumer",
-        "Fintech"
-      ],
-      "readTime": "5 min read",
-      "summary": "A single inbox that turns every purchase into a structured, searchable record for warranties, returns, and budgeting.",
-      "subtitle": "Concept · Consumer fintech",
-      "mark": "Every receipt, one place.",
-      "palette": 0,
-      "type": "product"
-    },
-    {
-      "section": "concepts",
-      "slug": "ai-chief-of-staff",
-      "title": "An AI Chief of Staff for Small Teams",
-      "date": "2026-10-02",
-      "status": "Sketch",
-      "tags": [
-        "AI",
-        "B2B"
-      ],
-      "readTime": "6 min read",
-      "summary": "A teammate inside Slack that tracks decisions, nudges owners, and writes the weekly recap.",
-      "subtitle": "Concept · AI for small teams",
-      "mark": "Ops for a team of ten.",
-      "palette": 1,
+      "slug": "spotify-rabbit-hole",
       "type": "feature",
-      "app": "Slack"
+      "app": "Spotify",
+      "title": "Rabbit Hole",
+      "date": "2026-11-24",
+      "readTime": "3 min read",
+      "palette": 1,
+      "mark": "One step further.",
+      "summary": "Radio keeps me close to what I know. Rabbit hole takes me one step further with every song."
     },
     {
       "section": "thoughts",
