@@ -618,3 +618,4 @@ a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color 
   main { padding-top: 112px; }
 }
 .art.live.ink[data-anim="marker"] { background: #f4f2ed; }
+.art.live.ink[data-anim="cutout"] { background: #a3b096; }

@@ -33,7 +33,7 @@
     if (p.cover) return `<img src="${esc(p.cover)}" alt="" loading="lazy">`;
     if (p.anim) {
       const kick = typeLabel(p) || p.ticker || p.status || "";
-      return `<div class="art live${["inkwaves", "marker"].includes(p.anim) ? " ink" : ""}" data-anim="${esc(p.anim)}"><canvas aria-hidden="true"></canvas></div>`;
+      return `<div class="art live${["inkwaves", "marker", "cutout"].includes(p.anim) ? " ink" : ""}" data-anim="${esc(p.anim)}"><canvas aria-hidden="true"></canvas></div>`;
     }
     const h = hash(p.slug);
     const [a, b] = PALETTE[p.palette ?? h % PALETTE.length];
@@ -295,9 +295,56 @@
   // ---------- Living covers: looping canvas animations, like a Spotify Canvas ----------
   // tiny deterministic noise for hand-drawn wobble
   const nz = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
+  const grainCache = new Map();
+  const grain = (w, h) => {   // drawn once per size, then reused every frame
+    const key = w + "x" + h; if (grainCache.has(key)) return grainCache.get(key);
+    const c = document.createElement("canvas"); c.width = w; c.height = h; const g = c.getContext("2d"), img = g.createImageData(w, h), d = img.data;
+    for (let i = 0; i < d.length; i += 4) { const v = Math.random(); d[i] = d[i + 1] = d[i + 2] = v > 0.5 ? 255 : 0; d[i + 3] = Math.abs(v - 0.5) * 34; }
+    g.putImageData(img, 0, 0); grainCache.set(key, c); return c;
+  };
   const sn = (x, b) => { const i = Math.floor(x), f = x - i, e = f * f * (3 - 2 * f); return nz(i, b) * (1 - e) + nz(i + 1, b) * e; };  // smooth noise
   const ANIMS = {
     // Hand-drawn ink: a sage disc with an offset outline, three sound-wave arcs, and dots falling one step further
+    // Marker on paper: muted sage card, bright green disc, thick rough black outline, chunky waves
+    cutout(ctx, w, h, t) {
+      const C = { paper: "#a3b096", green: "#4ccf6a", ink: "#121212" };
+      const boil = Math.floor(t * 3), S = Math.min(w, h), r = S * 0.33, cx = w / 2, cy = h / 2;
+      ctx.fillStyle = C.paper; ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(grain(w, h), 0, 0);
+      const ring = (rad, seed, k) => {   // rough closed path: soft wobble plus fine marker texture
+        const N = 240, wav = (a) => {   // sum of whole-number harmonics, so the edge wraps without a seam
+          let v = 0;
+          for (let h = 3; h <= 7; h++) v += Math.sin(h * a + nz(h, seed) * 6.28) * 0.007;
+          for (const h of [11, 13, 17, 19]) v += Math.sin(h * a + nz(h, seed + k) * 6.28) * 0.0024;
+          for (const h of [37, 47, 59, 71, 89]) v += Math.sin(h * a + nz(h, seed + 2 + k) * 6.28) * 0.0009;
+          return v;
+        };
+        for (let i = 0; i <= N; i++) {
+          const a = i / N * Math.PI * 2, rr = rad * (1 + wav(a));
+          const x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr;
+          i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+        }
+        ctx.closePath();
+      };
+      ctx.beginPath(); ring(r, 4, 0); ctx.fillStyle = C.green; ctx.fill();
+      // outline as a band between two rough edges, so its thickness varies like a marker
+      ctx.beginPath(); ring(r * 1.085, 9, (boil % 2) * 0.4); ring(r * 0.985, 4, 0); ctx.fillStyle = C.ink; ctx.fill("evenodd");
+      // chunky waves
+      ctx.strokeStyle = C.ink; ctx.lineCap = "round"; ctx.lineJoin = "round";
+      const B = (u, a, b, c, e) => (1 - u) ** 3 * a + 3 * (1 - u) ** 2 * u * b + 3 * (1 - u) * u * u * c + u ** 3 * e;
+      [[-0.6, 0.6, -0.3, 0.17], [-0.5, 0.5, -0.02, 0.15], [-0.4, 0.4, 0.24, 0.125]].forEach(([x0, x1, yy, lw], k) => {
+        const pulse = Math.max(0, Math.sin(t * 2.2 - k * 1.1)), y = cy + yy * r - pulse * r * 0.015;
+        const P = [[cx + x0 * r, y + r * 0.03], [cx + x0 * 0.35 * r, y - r * 0.13], [cx + x1 * 0.4 * r, y - r * 0.12], [cx + x1 * r, y + r * 0.11]];
+        ctx.beginPath(); ctx.lineWidth = r * lw * (1 + pulse * 0.05);
+        for (let i = 0; i <= 40; i++) {
+          const u = i / 40, j = (sn(u * 6, 30 + k + (boil % 2) * 0.3) - 0.5) * r * 0.016;
+          const x = B(u, P[0][0], P[1][0], P[2][0], P[3][0]), yv = B(u, P[0][1], P[1][1], P[2][1], P[3][1]) + j;
+          i ? ctx.lineTo(x, yv) : ctx.moveTo(x, yv);
+        }
+        ctx.stroke();
+      });
+      ctx.drawImage(grain(w, h), 0, 0);   // grain over everything, like printed paper
+    },
     // Flat marker drawing: bright green blob, a loose double pen outline, three thick marker waves
     marker(ctx, w, h, t) {
       const C = { paper: "#f4f2ed", green: "#4cbe63", ink: "#151513" };
