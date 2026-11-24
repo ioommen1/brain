@@ -928,3 +928,5 @@ div.dk-row { grid-template-columns: 26px minmax(0, 1fr) 40px; }
 .dk-rhbtn.on::before { bottom: -5px; }
 .dk-next.glow::after { inset: -8px; }
 .dk-vol .ic { width: 20px; height: 20px; }
+.dk-play { width: 34px; height: 34px; } .dk-play .ic { width: 18px; height: 18px; }
+.dk-bigplay .ic { width: 22px; height: 22px; }
