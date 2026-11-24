@@ -596,3 +596,7 @@ a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color 
 .hero h1, .page-top h1, .article h1, .prose h3, .pt h3, .wide-hero .art .mark, .frame .art .mark { font-family: var(--serif); }
 .hero h1, .page-top h1, .article h1 { font-weight: 400; letter-spacing: -0.025em; }
 .prose h3, .pt h3 { font-weight: 500; letter-spacing: -0.01em; }
+
+/* Ink illustration covers sit on cream paper, so text is dark */
+.art.live.ink { background: #efe9dc; color: #2b2a27; }
+.art.live.ink .kicker { opacity: .6; }

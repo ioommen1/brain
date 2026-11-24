@@ -33,7 +33,7 @@
     if (p.cover) return `<img src="${esc(p.cover)}" alt="" loading="lazy">`;
     if (p.anim) {
       const kick = typeLabel(p) || p.ticker || p.status || "";
-      return `<div class="art live" data-anim="${esc(p.anim)}"><canvas aria-hidden="true"></canvas>
+      return `<div class="art live${p.anim === "inkwaves" ? " ink" : ""}" data-anim="${esc(p.anim)}"><canvas aria-hidden="true"></canvas>
         <span class="kicker" style="position:relative">${esc(kick)}</span><span class="mark" style="position:relative">${esc(p.mark || p.title)}</span></div>`;
     }
     const h = hash(p.slug);
@@ -296,7 +296,53 @@
   }
 
   // ---------- Living covers: looping canvas animations, like a Spotify Canvas ----------
+  // tiny deterministic noise for hand-drawn wobble
+  const nz = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
   const ANIMS = {
+    // Hand-drawn ink: a sage disc with an offset outline, three sound-wave arcs, and dots falling one step further
+    inkwaves(ctx, w, h, t) {
+      const boil = Math.floor(t * 6);               // line boil: redraw the wobble ~6 times a second
+      const C = { paper: "#efe9dc", sage: "#8fb69a", ink: "#1f1e1c", clay: "#d97757", white: "#fbf8f1" };
+      ctx.fillStyle = C.paper; ctx.fillRect(0, 0, w, h);
+      const s = Math.min(w, h), r = s * 0.3, cx = w * 0.64, cy = h * 0.46, lw = Math.max(1.5, s * 0.011);
+      const blob = (x, y, rad, seed, amp) => {
+        const N = 18, pts = [];
+        for (let i = 0; i < N; i++) { const a = (i / N) * Math.PI * 2, j = 1 + (nz(i, seed) - 0.5) * amp; pts.push([x + Math.cos(a) * rad * j, y + Math.sin(a) * rad * j]); }
+        const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+        ctx.beginPath(); let m = mid(pts[N - 1], pts[0]); ctx.moveTo(m[0], m[1]);
+        for (let i = 0; i < N; i++) { const p = pts[i], q = mid(p, pts[(i + 1) % N]); ctx.quadraticCurveTo(p[0], p[1], q[0], q[1]); }
+        ctx.closePath();
+      };
+      // offset fill, then the ink outline slightly off-register
+      blob(cx - r * 0.06, cy + r * 0.05, r, 3, 0.035); ctx.fillStyle = C.sage; ctx.fill();
+      blob(cx + r * 0.03, cy - r * 0.03, r * 1.02, boil + 11, 0.03); ctx.strokeStyle = C.ink; ctx.lineWidth = lw; ctx.lineJoin = "round"; ctx.stroke();
+      // three sound-wave arcs, rippling in sequence
+      ctx.lineCap = "round";
+      for (let k = 0; k < 3; k++) {
+        const lift = Math.sin(t * 2.2 - k * 0.9) * r * 0.035;
+        const y = cy - r * 0.34 + k * r * 0.3 - lift, half = r * (0.62 - k * 0.1), bend = r * (0.2 - k * 0.03);
+        const wob = (n) => (nz(n, boil * 7 + k) - 0.5) * r * 0.025;
+        ctx.beginPath();
+        ctx.moveTo(cx - half + wob(1), y + bend * 0.55 + wob(2));
+        ctx.bezierCurveTo(cx - half * 0.45 + wob(3), y - bend * 0.35 + wob(4), cx + half * 0.45 + wob(5), y - bend * 0.25 + wob(6), cx + half + wob(7), y + bend * 0.7 + wob(8));
+        ctx.strokeStyle = C.ink; ctx.lineWidth = r * (0.13 - k * 0.018); ctx.stroke();
+        // white highlight tick
+        ctx.beginPath(); ctx.moveTo(cx - half * 0.15, y - bend * 0.08 - r * 0.02); ctx.lineTo(cx + half * 0.2, y - bend * 0.04 - r * 0.02);
+        ctx.strokeStyle = C.white; ctx.lineWidth = Math.max(1, r * 0.018); ctx.stroke();
+      }
+      // a few loose ink marks around the disc
+      ctx.strokeStyle = C.ink; ctx.lineWidth = lw * 0.8;
+      [[-0.95, -0.3, -0.9, 0.05], [0.88, 0.55, 0.98, 0.3]].forEach(([a, b, c, d], i) => {
+        ctx.beginPath(); ctx.moveTo(cx + r * a + (nz(i, boil) - .5) * 2, cy + r * b); ctx.lineTo(cx + r * c, cy + r * d + (nz(i + 5, boil) - .5) * 2); ctx.stroke();
+      });
+      // clay dots falling out of the bottom wave, one step further each time
+      for (let j = 0; j < 4; j++) {
+        const k = ((t * 0.22) + j / 4) % 1;
+        const x = cx + r * 0.25 + k * r * 0.95, y = cy + r * 0.3 + k * k * r * 1.35;
+        ctx.beginPath(); ctx.arc(x, y, r * 0.075 * (1 - k * 0.65), 0, Math.PI * 2);
+        ctx.fillStyle = C.clay; ctx.globalAlpha = 1 - k * 0.8; ctx.fill(); ctx.globalAlpha = 1;
+      }
+    },
     // A tunnel of rings sinking inward, with a trail of dots heading down the hole
     tunnel(ctx, w, h, t) {
       const g = ctx.createLinearGradient(0, 0, w, h); g.addColorStop(0, "#22403a"); g.addColorStop(1, "#4f7469");
