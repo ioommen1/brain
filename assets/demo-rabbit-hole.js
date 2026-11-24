@@ -108,11 +108,11 @@
           </div>
         </div>
         <div class="dk-player">
-          <div class="dk-now">${art(cur, "sm")}<span><b>${esc(cur.title)}</b><small>${esc(cur.artist)}</small></span>
-            <button type="button" class="dk-ib dk-rhbtn${rh ? " on" : coached ? "" : " hint"}" aria-label="${rh ? "In a rabbit hole" : "Go down the rabbit hole from this song"}" title="Go down the rabbit hole">${ic("hole")}</button>
-            ${!rh && !coached ? `<span class="dk-coach" role="note"><b>New</b>Go down the rabbit hole from this song</span>` : ""}</div>
+          <div class="dk-now">${art(cur, "sm")}<span><b>${esc(cur.title)}</b><small>${esc(cur.artist)}</small></span></div>
           <div class="dk-ctrl">
             <div class="dk-btns">
+            <button type="button" class="dk-ib dk-rhbtn${rh ? " on" : coached ? "" : " hint"}" aria-label="${rh ? "In a rabbit hole" : "Go down the rabbit hole from this song"}" title="Go down the rabbit hole">${ic("hole")}</button>
+            ${!rh && !coached ? `<span class="dk-coach" role="note"><b>New</b>Go down the rabbit hole from this song</span>` : ""}
               <button type="button" class="dk-ib dk-shuf${shuffle ? " on" : ""}" aria-label="Shuffle">${ic("shuffle")}</button>
               <button type="button" class="dk-ib dk-prev" aria-label="Previous">${ic("prev", "", true)}</button>
               <button type="button" class="dk-play" aria-label="${playing ? "Pause" : "Play"}">${ic(playing ? "pause" : "play", "", !playing)}</button>
@@ -141,7 +141,7 @@
         menuAt = { x, y }; menu = true; coached = true; render();
       };
       $(".dk-more").addEventListener("click", (e) => menu ? (menu = false, render()) : openMenu(e, e.currentTarget));
-      const cc = $(".dk-now .dk-coach"), rb = $(".dk-rhbtn");
+      const cc = $(".dk-btns .dk-coach"), rb = $(".dk-rhbtn");
       if (cc && rb) cc.style.setProperty("--ax", (rb.getBoundingClientRect().left + rb.offsetWidth / 2 - cc.getBoundingClientRect().left - 5) + "px");
       $(".dk-rhbtn").addEventListener("click", () => {
         coached = true; menu = false;

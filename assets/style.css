@@ -906,3 +906,11 @@ div.dk-row { grid-template-columns: 26px minmax(0, 1fr) 40px; }
 .dk-rhbtn.hint { color: #fff; } .dk-rhbtn.hint::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid var(--g); animation: ring 1.8s ease-out infinite; }
 .dk-now .dk-coach { position: absolute; left: 0; bottom: calc(100% + 14px); margin: 0; white-space: nowrap; z-index: 4; }
 .dk-now .dk-coach::before { left: var(--ax, 140px); top: auto; bottom: -5px; margin: 0; }
+/* Rabbit hole button sits with the playback modes */
+.dk-btns { position: relative; }
+.dk-rhbtn { width: 24px; height: 24px; }
+.dk-rhbtn .ic { width: 17px; height: 17px; }
+.dk-rhbtn.on::before { content: ""; position: absolute; left: 50%; bottom: -6px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--g); }
+.dk-btns .dk-coach { position: absolute; left: -14px; bottom: calc(100% + 14px); margin: 0; white-space: nowrap; z-index: 4; }
+.dk-btns .dk-coach::before { left: var(--ax, 20px); top: auto; bottom: -5px; margin: 0; }
+.dk-rhbtn.on::before { bottom: -2px; }
