@@ -2,7 +2,7 @@
 (function () {
   const app = document.getElementById("app");
   const SECTIONS = {
-    concepts: { title: "Concepts", layout: "gallery", blurb: "A feature for an app I use, or a new product. One a week." },
+    concepts: { title: "Concepts", layout: "gallery", blurb: "Here's how I'd fix some of my favorite apps." },
     thoughts: { title: "Thoughts", layout: "notes", blurb: "Short notes on products, markets, and what I'm learning." },
     memos: { title: "Memos", layout: "gallery", blurb: "How I'd underwrite a company: thesis, risks, and what it's worth." },
   };
