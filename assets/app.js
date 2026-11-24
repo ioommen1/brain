@@ -33,7 +33,7 @@
     if (p.cover) return `<img src="${esc(p.cover)}" alt="" loading="lazy">`;
     if (p.anim) {
       const kick = typeLabel(p) || p.ticker || p.status || "";
-      return `<div class="art live${p.anim === "inkwaves" ? " ink" : ""}" data-anim="${esc(p.anim)}"><canvas aria-hidden="true"></canvas></div>`;
+      return `<div class="art live${["inkwaves", "marker"].includes(p.anim) ? " ink" : ""}" data-anim="${esc(p.anim)}"><canvas aria-hidden="true"></canvas></div>`;
     }
     const h = hash(p.slug);
     const [a, b] = PALETTE[p.palette ?? h % PALETTE.length];
@@ -297,6 +297,43 @@
   const nz = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
   const ANIMS = {
     // Hand-drawn ink: a sage disc with an offset outline, three sound-wave arcs, and dots falling one step further
+    // Flat marker drawing: bright green blob, a loose double pen outline, three thick marker waves
+    marker(ctx, w, h, t) {
+      const C = { paper: "#f4f2ed", green: "#4cbe63", ink: "#151513" };
+      const boil = Math.floor(t * 4), S = Math.min(w, h), r = S * 0.36, n = (i, k) => nz(i, k) - 0.5;
+      ctx.fillStyle = C.paper; ctx.fillRect(0, 0, w, h);
+      const cx = w / 2, cy = h / 2, tilt = Math.sin(t * 0.9) * 0.025;
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(tilt); ctx.translate(-cx, -cy);
+      // green blob, slightly lumpy and off-center like a marker fill
+      const N = 14, pts = [];
+      for (let i = 0; i < N; i++) { const a = i / N * Math.PI * 2, j = 1 + n(i, 5) * 0.07; pts.push([cx - r * 0.04 + Math.cos(a) * r * 1.04 * j, cy + r * 0.02 + Math.sin(a) * r * 1.04 * j]); }
+      const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+      ctx.beginPath(); let m = mid(pts[N - 1], pts[0]); ctx.moveTo(m[0], m[1]);
+      for (let i = 0; i < N; i++) { const p = pts[i], q = mid(p, pts[(i + 1) % N]); ctx.quadraticCurveTo(p[0], p[1], q[0], q[1]); }
+      ctx.closePath(); ctx.fillStyle = C.green; ctx.fill();
+      // two loose pen loops that overlap where they start and end
+      ctx.strokeStyle = C.ink; ctx.lineCap = "round"; ctx.lineJoin = "round";
+      [[0.97, -2.2, 0.0, -0.01, 1], [0.93, -2.0, -0.015, 0.01, 2]].forEach(([rr, a0, ox, oy, k]) => {
+        ctx.beginPath(); ctx.lineWidth = S * (k === 1 ? 0.0065 : 0.0055);
+        const steps = 90, sweep = Math.PI * 2 + 0.35;
+        for (let i = 0; i <= steps; i++) {
+          const a = a0 + sweep * i / steps, jit = 1 + n(Math.floor(i / 6), boil * 3 + k) * 0.012;
+          const x = cx + ox * r + Math.cos(a) * r * rr * jit, y = cy + oy * r + Math.sin(a) * r * rr * jit;
+          i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+        }
+        ctx.stroke();
+      });
+      // three marker waves, pulsing in turn
+      [[-0.6, 0.62, -0.34, 0.165], [-0.5, 0.52, -0.06, 0.14], [-0.41, 0.42, 0.2, 0.12]].forEach(([x0, x1, yy, lw], k) => {
+        const pulse = Math.max(0, Math.sin(t * 2.4 - k * 1.1)), lift = pulse * r * 0.025, jj = (i) => n(i, boil * 11 + k) * r * 0.012;
+        ctx.beginPath(); ctx.lineWidth = r * lw * (1 + pulse * 0.07);
+        const y = cy + yy * r - lift;
+        ctx.moveTo(cx + x0 * r + jj(1), y + r * 0.01);
+        ctx.bezierCurveTo(cx + (x0 * 0.4) * r + jj(2), y - r * 0.13, cx + (x1 * 0.45) * r + jj(3), y - r * 0.11, cx + x1 * r + jj(4), y + r * 0.13);
+        ctx.stroke();
+      });
+      ctx.restore();
+    },
     inkwaves(ctx, w, h, t) {
       const C = { paper: "#f1ebde", sage: "#9cc3a4", sageLo: "#7aa688", sageHi: "#c4dfc8", ink: "#24221f", clay: "#d97757", blush: "#e9b8a6", white: "#fffaf0" };
       const boil = Math.floor(t * 4), S = Math.min(w, h);
@@ -331,10 +368,7 @@
       };
 
       // gentle bounce with squash and stretch
-      const bob = Math.sin(t * 1.6), r = S * 0.27;
-      const cx = w * 0.42, cy = h * 0.47 - bob * S * 0.012, sx = 1 + bob * 0.012, sy = 1 - bob * 0.012;
-      // ground shadow
-      ctx.beginPath(); ctx.ellipse(cx, h * 0.47 + r * 1.12, r * (0.78 - bob * 0.04), r * 0.09, 0, 0, Math.PI * 2); ctx.fillStyle = "rgba(36,34,31,.08)"; ctx.fill();
+      const r = S * 0.32, cx = w / 2, cy = h / 2, sx = 1, sy = 1;
 
       ctx.save(); ctx.translate(cx, cy); ctx.scale(sx, sy); ctx.translate(-cx, -cy);
       // disc: offset fill with soft shading
@@ -353,30 +387,6 @@
       }
       ctx.restore();
 
-      // the rabbit hole, with ears peeking out
-      const hx = w * 0.8, hy = h * 0.8, hr = S * 0.13;
-      const twitch = Math.max(0, Math.sin(t * 1.3) - 0.92) * 9;      // occasional ear twitch
-      const ear = (dx, rot) => {
-        ctx.save(); ctx.translate(hx + dx * hr, hy - hr * 0.05); ctx.rotate(rot);
-        ctx.beginPath(); ctx.ellipse(0, -hr * 0.42, hr * 0.13, hr * 0.42, 0, 0, Math.PI * 2); ctx.fillStyle = C.white; ctx.fill();
-        ctx.lineWidth = S * 0.007; ctx.strokeStyle = C.ink; ctx.stroke();
-        ctx.beginPath(); ctx.ellipse(0, -hr * 0.44, hr * 0.055, hr * 0.28, 0, 0, Math.PI * 2); ctx.fillStyle = C.blush; ctx.fill();
-        ctx.restore();
-      };
-      ear(-0.16, -0.22 - twitch * 0.08); ear(0.14, 0.18 + twitch * 0.12);
-      ctx.beginPath(); ctx.ellipse(hx, hy, hr, hr * 0.32, 0, 0, Math.PI * 2); ctx.fillStyle = C.ink; ctx.fill();
-      ctx.beginPath(); ctx.ellipse(hx, hy - hr * 0.08, hr * 0.94, hr * 0.22, 0, Math.PI * 1.05, Math.PI * 1.95); ctx.strokeStyle = "rgba(255,250,240,.35)"; ctx.lineWidth = S * 0.004; ctx.stroke();
-
-      // notes fall from the bottom wave into the hole
-      for (let j = 0; j < 4; j++) {
-        const k = ((t * 0.2) + j / 4) % 1, e = k * k;
-        const x0 = cx + r * 0.42, y0 = cy + r * 0.18;
-        const x = x0 + (hx - x0) * k, y = y0 + (hy - y0) * e - Math.sin(Math.PI * k) * r * 0.25;
-        const rad = r * 0.07 * (1 - k * 0.55);
-        if (k > 0.96) continue;
-        ctx.beginPath(); ctx.arc(x, y, rad, 0, Math.PI * 2); ctx.fillStyle = C.clay; ctx.fill();
-        ctx.lineWidth = S * 0.004; ctx.strokeStyle = C.ink; ctx.stroke();
-      }
     },
     // A tunnel of rings sinking inward, with a trail of dots heading down the hole
     tunnel(ctx, w, h, t) {

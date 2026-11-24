@@ -617,3 +617,4 @@ a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color 
   .wrap { margin-left: max(320px, calc((100vw - 960px) / 2)); max-width: min(960px, calc(100vw - 360px)); }
   main { padding-top: 112px; }
 }
+.art.live.ink[data-anim="marker"] { background: #f4f2ed; }
