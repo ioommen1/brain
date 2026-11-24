@@ -526,7 +526,7 @@ a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color 
 /* ================= One sidebar for everything ================= */
 .brand { display: none; }
 .side-toc { display: none; }
-@media (min-width: 1000px) {
+@media (min-width: 860px) {
   .wrap { margin-left: max(250px, calc((100vw - 960px) / 2)); margin-right: auto; max-width: min(960px, calc(100vw - 290px)); }
   .site-header { position: fixed; top: 0; bottom: 0; left: max(0px, calc((100vw - 960px) / 2 - 250px)); width: 220px; z-index: 6;
     flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 28px; padding: 44px 0 36px 36px; border-bottom: 0; }
@@ -544,7 +544,7 @@ a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color 
   .theme-toggle { margin-top: auto; margin-left: -6px; }
   main { padding-top: 48px; }
 }
-@media (max-width: 999px) {
+@media (max-width: 859px) {
   .brand { display: block; font-family: var(--serif); font-size: 22px; color: var(--fg); flex-basis: 100%; }
   .site-header { flex-wrap: wrap; row-gap: 14px; }
 }
@@ -604,18 +604,79 @@ a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color 
 /* Name: quiet, in line with the nav */
 .brand { font-size: 14.5px !important; font-weight: 400 !important; color: var(--muted) !important; letter-spacing: 0 !important; transition: color .35s ease; }
 .brand:hover { color: var(--fg) !important; }
-@media (min-width: 1000px) { .brand { padding-left: 14px; } .site-header { gap: 18px; } }
-@media (max-width: 999px) { .brand { font-size: 14px !important; } }
+@media (min-width: 860px) { .brand { padding-left: 14px; } .site-header { gap: 18px; } }
+@media (max-width: 859px) { .brand { font-size: 14px !important; } }
 
 /* Captions: title, then what it does */
 .frame.done .cap { display: block; height: auto; white-space: normal; margin-top: 12px; }
 .frame.done .cap .ct { display: block; color: var(--fg); }
 .frame.done .cap em { display: block; color: var(--muted); margin-top: 2px; }
 /* Sidebar sits lower, with more room before the content */
-@media (min-width: 1000px) {
+@media (min-width: 860px) {
   .site-header { padding-top: 120px; left: max(0px, calc((100vw - 960px) / 2 - 300px)); }
   .wrap { margin-left: max(320px, calc((100vw - 960px) / 2)); max-width: min(960px, calc(100vw - 360px)); }
   main { padding-top: 112px; }
 }
 .art.live.ink[data-anim="marker"] { background: #f4f2ed; }
 .art.live.ink[data-anim="cutout"] { background: #a3b096; }
+
+/* ================= Shelf, drawn: flat cut-paper fills + a wobbly ink line, slightly off-register ================= */
+:root { --line: #24221f; --wood: #cfae82; --paper-card: #fbf7ee; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --line: #e8e4dc; --wood: #8a6d4c; --paper-card: #e9e2d4; } }
+:root[data-theme="dark"] { --line: #e8e4dc; --wood: #8a6d4c; --paper-card: #e9e2d4; }
+
+.row-of .sp, .row-of .sp.book, .row-of .cd, .row-of .film, .row-of .paper, .row-of .recipe {
+  background: none !important; background-image: none !important; box-shadow: none !important; border: 0 !important; isolation: isolate; }
+/* the cut-paper fill */
+.row-of .sp::before { content: "" !important; display: block !important; position: absolute !important; inset: 0 !important; height: auto !important;
+  left: 0 !important; right: 0 !important; top: 0 !important; bottom: 0 !important; opacity: 1 !important;
+  background: var(--c) !important; border-radius: 3px 3px 1px 1px; filter: url(#rough); z-index: -1; }
+.row-of .sp::after { display: none !important; }
+.row-of .paper::before { background: var(--paper-card) !important; }
+/* the ink line, drawn on top and a touch off-register */
+.sp .ln, .plank .ln, .tg .ln { position: absolute; inset: 0; border: 2.4px solid var(--line); border-radius: 3px 3px 2px 2px; pointer-events: none;
+  transform: translate(1.5px, -1.5px) rotate(var(--tilt, 0deg)); filter: url(#wobble); z-index: 2; }
+.row-of .book .t, .row-of .film .t, .row-of .cd .t, .row-of .recipe span, .row-of .paper span { position: relative; z-index: 1; }
+.row-of .book .t { margin-top: 0 !important; }
+.row-of .book .dot, .row-of .film .dot { opacity: .7; }
+.row-of .cd { width: 15px; padding: 8px 0; }
+.row-of .cd .t { color: var(--ink, #fff); }
+.row-of .recipe span { color: #4a3c2e; }
+.row-of .paper { border: 0; }
+.row-of .paper span { color: #4a4036; }
+.row-of .recipe { background-image: none !important; }
+
+/* plank and recipe box: flat wood, same ink line */
+.plank { background: none !important; box-shadow: none !important; position: relative; height: 16px; }
+.plank::before { content: ""; position: absolute; inset: 0; background: var(--wood); filter: url(#rough); }
+.plank .ln { border-radius: 2px; transform: translate(-1.5px, 1.5px) rotate(-0.15deg); }
+.rbox .box { background: none !important; box-shadow: none !important; color: rgba(40, 28, 16, .6); }
+.rbox .box::before { content: ""; position: absolute; inset: 0; background: var(--wood); filter: url(#rough); z-index: -1; border-radius: 3px; }
+.rbox .box::after { content: ""; position: absolute; inset: 0; border: 2.4px solid var(--line); border-radius: 3px; filter: url(#wobble); transform: translate(1.5px, -1px) rotate(.3deg); }
+.rbox .box { isolation: isolate; }
+
+/* Favorites tag hanging from the shelf */
+.shelf-unit { position: relative; }
+.fav-tag { position: relative; height: 70px; margin-left: 36px; width: 120px; transform-origin: 12px 0; transform: rotate(-5deg); animation: sway 5s ease-in-out infinite; }
+.fav-tag .string { position: absolute; left: 12px; top: -2px; width: 2px; height: 22px; background: var(--line); filter: url(#wobble); }
+.fav-tag .tg { position: absolute; top: 18px; left: 0; display: inline-flex; align-items: center; padding: 7px 14px 7px 22px; font-size: 13px; font-weight: 500; color: #fff; isolation: isolate; }
+.fav-tag .tg::before { content: ""; position: absolute; inset: 0; background: var(--accent); filter: url(#rough); z-index: -1;
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 10px 100%, 0 50%); }
+.fav-tag .tg .ln { border-radius: 2px; clip-path: none; transform: translate(1.5px, -1.5px) rotate(.5deg); }
+.fav-tag .tg::after { content: ""; position: absolute; left: 9px; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--bg); box-shadow: 0 0 0 2px var(--line); }
+@keyframes sway { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(-2deg); } }
+@media (prefers-reduced-motion: reduce) { .fav-tag { animation: none; } }
+
+/* pulled-out generated covers and recipe card: flat, outlined, no shadows */
+.pv.cover-book, .pv.cover-film, .pv.cover-cd { background-image: none !important; box-shadow: none !important; border: 2.4px solid var(--line); }
+.pv.has-img { border: 0; box-shadow: none; }
+.pv.recipe-card { background-image: none !important; box-shadow: none !important; border: 2.4px solid var(--line); }
+.pv.paper-shot { box-shadow: none !important; border: 2.4px solid var(--line); }
+.shelf-unit { margin-bottom: 40px; }
+
+/* Narrower windows keep the sidebar, just slimmer */
+@media (min-width: 860px) and (max-width: 1179px) {
+  .site-header { left: 0; width: 190px; padding-left: 22px; }
+  .wrap { margin-left: 210px; max-width: calc(100vw - 236px); }
+  .sheet { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}

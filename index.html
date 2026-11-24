@@ -11,7 +11,11 @@
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-  <div class="wrap">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter>
+    <filter id="wobble"><feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="2" seed="11"/><feDisplacementMap in="SourceGraphic" scale="3.6"/></filter>
+  </svg>
+<div class="wrap">
     <header class="site-header">
       <a href="#/" class="brand">Isaac Oommen</a>
       <nav class="nav" aria-label="Sections">

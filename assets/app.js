@@ -174,18 +174,18 @@
       const h = hash(it.title);
       if (kind === "paper") {
         const w = 150 + (h % 50);
-        return `<button class="sp paper" data-i="${i}" style="width:${w}px" aria-label="${esc(it.title)}"><span>${esc(it.title)}</span></button>`;
+        return `<button class="sp paper" data-i="${i}" style="width:${w}px" aria-label="${esc(it.title)}"><span>${esc(it.title)}</span><i class="ln" style="--tilt:${((h % 7) - 3) * 0.25}deg"></i></button>`;
       }
       if (kind === "recipe") {
         const ht = 78 + (h % 26);
-        return `<button class="sp recipe" data-i="${i}" style="--c:${tint(it.color)};height:${ht}px" aria-label="${esc(it.title)} recipe"><span>${esc(it.title)}</span></button>`;
+        return `<button class="sp recipe" data-i="${i}" style="--c:${tint(it.color)};height:${ht}px" aria-label="${esc(it.title)} recipe"><span>${esc(it.title)}</span><i class="ln" style="--tilt:${((h % 7) - 3) * 0.25}deg"></i></button>`;
       }
-      if (kind === "cd") return `<button class="sp cd" data-i="${i}" style="--c:${tint(it.color)}" aria-label="${esc(it.title)} by ${esc(it.by)}"><span class="t">${esc(it.title)}</span></button>`;
-      if (kind === "film") return `<button class="sp film" data-i="${i}" style="--c:${tint(it.color)}" aria-label="${esc(it.title)}"><span class="t">${esc(it.title)}</span><i class="dot"></i></button>`;
+      if (kind === "cd") return `<button class="sp cd" data-i="${i}" style="--c:${tint(it.color)}" aria-label="${esc(it.title)} by ${esc(it.by)}"><span class="t">${esc(it.title)}</span><i class="ln" style="--tilt:${((h % 7) - 3) * 0.25}deg"></i></button>`;
+      if (kind === "film") return `<button class="sp film" data-i="${i}" style="--c:${tint(it.color)}" aria-label="${esc(it.title)}"><span class="t">${esc(it.title)}</span><i class="dot"></i><i class="ln" style="--tilt:${((h % 7) - 3) * 0.25}deg"></i></button>`;
       const w = Math.round(24 + Math.min(it.pages || 300, 640) / 640 * 26);
       const ht = 74 + (h % 20);
       return `<button class="sp book s-${styleOf(it)}${last ? " lean" : ""}" data-i="${i}" style="--c:${tint(it.color)};--ink:${it.ink || "#fff"};width:${w}px;height:${ht}%" aria-label="${esc(it.title)} by ${esc(it.by)}">
-        <span class="t">${esc(it.title)}</span><i class="dot"></i></button>`;
+        <span class="t">${esc(it.title)}</span><i class="dot"></i><i class="ln" style="--tilt:${((h % 7) - 3) * 0.25}deg"></i></button>`;
     };
 
     const shelfHtml = (keys, si) => {
@@ -199,7 +199,8 @@
       if (cards.length) html += `<span class="gap"></span><span class="rbox"><span class="cards">${cards.map((it) => spine(it, "recipe")).join("")}</span><span class="box">Recipes</span></span>`;
       return `<section class="shelf-unit" data-s="${si}">
         <div class="ledge"><div class="row-of">${html}</div></div>
-        <div class="plank"></div>
+        <div class="plank"><i class="ln"></i></div>
+        ${si === 0 ? `<div class="fav-tag" aria-hidden="true"><i class="string"></i><span class="tg"><i class="ln"></i>Favorites</span></div>` : ""}
         <div class="pulled" aria-live="polite"></div>
       </section>`;
     };
