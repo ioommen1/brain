@@ -52,15 +52,35 @@ The first few still feel like the song I picked. Ten songs in, I'm somewhere I'v
 
 #### Entry point
 
-### One tap, from the menu I already use.
+### One tap, right next to shuffle.
 
-"Go down the rabbit hole" sits right under "Go to song radio." Nothing new gets added to the screen.
+Rabbit hole is a way of listening, like shuffle or repeat, so it lives with them in the player. It always starts from whatever is playing right now.
 
 #### The journey
 
 ### Each song moves a little further.
 
 A different artist with the same sound, then that sound from another decade, then a new genre that shares something with the last song. It never plays anything I've already heard.
+
+#### What "one step" means
+
+### Every song keeps something from the last one, and changes one thing.
+
+Spotify already understands every song in three ways: how it sounds (tempo, energy, acoustic or electronic), where it comes from (genre, scene, decade), and who listens to it (people who play this also play that). A step changes just one of those and keeps the others.
+
+Starting from a soft bossa nova song, one step might keep the sound and the era but move to a different Brazilian artist. The next keeps that jazz feel but crosses to Ethiopian jazz from the same decade. The next keeps the hypnotic rhythm but lands in desert blues. Each move makes sense on its own, even though the end feels far from the start.
+
+### Three rules keep it from feeling random.
+
+**Each song only has to connect to the one before it.** Not to the song I started with. That's what lets ten small steps add up to somewhere completely new.
+
+**Distance from the start only goes up.** If the next song would pull me back toward where I began, it gets skipped. Otherwise it slowly turns back into radio.
+
+**Nothing I've already heard.** Every song in a rabbit hole is new to me, or the whole point is lost.
+
+### My skips decide how big a step is.
+
+If I skip a song in the first few seconds, that step was too far, so the next one is smaller. If I listen all the way through, the next step can reach a little further. The feature learns my comfort zone while I'm using it, without asking me to set anything.
 
 #### The trail
 
@@ -82,4 +102,4 @@ My first idea was the dial, because it answered the complaint directly. Rabbit h
 
 ### The hardest part is the part nobody sees.
 
-How far is one step? Too small and it feels like radio. Too big and it feels random. The whole feature depends on getting that distance right, and that would take real testing with real listeners.
+How far is one step? Too small and it feels like radio. Too big and it feels random. Letting skips set the step size is my best answer, but getting it right would take real testing with real listeners.
