@@ -463,3 +463,13 @@ a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color 
 .hero h1 { letter-spacing: -0.02em; } .article h1, .page-top h1 { letter-spacing: -0.015em; }
 .prose h3 { letter-spacing: -0.01em; }
 .row .r-title, .i-title { font-weight: 400; font-size: 20px; }
+
+/* Simplified index: one typeface, title + summary + date */
+.row { grid-template-columns: minmax(0, 1fr) auto; gap: 24px; padding: 22px 0; }
+.row .r-title, .i-title { font-family: var(--sans); font-weight: 400; font-size: 17px; letter-spacing: -0.01em; }
+.row .r-sum { font-size: 14.5px; }
+.row::before { top: 31px; }
+@media (max-width: 760px) {
+  .row { grid-template-columns: 56px minmax(0, 1fr); gap: 4px 16px; }
+  .row .r-date { display: block; grid-column: 2; text-align: left; font-size: 12.5px; }
+}

@@ -48,10 +48,8 @@
   const shortDate = (d) => new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   const row = (p) => `<a class="row" href="#/${p.section}/${p.slug}" data-slug="${p.section}/${p.slug}">
-      <span class="r-no mono">${code(p)}</span>
       <span class="r-thumb">${cover(p)}</span>
       <span class="r-main"><span class="r-title">${esc(p.title)}</span><span class="r-sum">${esc(p.summary)}</span></span>
-      <span class="r-kind mono">${esc(typeLabel(p) || p.ticker || p.status || KIND[p.section])}</span>
       <span class="r-date mono">${shortDate(p.date)}</span>
     </a>`;
 
@@ -84,7 +82,7 @@
       : `<section class="hero"><h1>${site.headline}</h1></section>`;
     app.innerHTML = `${head}
       <section class="index">
-        <div class="filters mono">${groups.map(([g, label], i) => `<button class="${i ? "" : "on"}" data-g="${esc(g)}">${esc(label)}<sup>${String(count(g)).padStart(2, "0")}</sup></button>`).join("")}</div>
+        <div class="filters mono">${groups.map(([g, label], i) => `<button class="${i ? "" : "on"}" data-g="${esc(g)}">${esc(label)}</button>`).join("")}</div>
         <div class="rows" id="list">${items.map(row).join("")}</div>
       </section>`;
     app.querySelectorAll(".filters button").forEach((b) => b.addEventListener("click", () => {
