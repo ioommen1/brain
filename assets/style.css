@@ -118,6 +118,7 @@ main { min-height: 60vh; padding: 32px 0 64px; }
 .back { font-size: 15px; color: var(--muted); }
 .back:hover { color: var(--accent-text); }
 .article-meta { color: var(--muted); font-size: 14px; margin: 28px 0 6px; }
+.article-layout .article-meta { margin-top: 32px; }
 .article h1 { font-size: clamp(28px, 5vw, 38px); font-weight: 500; line-height: 1.15; margin: 0 0 12px; letter-spacing: -0.02em; }
 .article .lede { font-size: 19px; color: var(--muted); margin: 0 0 28px; }
 .article .hero { margin: 0 0 32px; }
@@ -279,3 +280,24 @@ main > * { animation: fade .35s ease both; }
 }
 .loupe-ring.press span { width: 24px; height: 24px; }
 .loupe-out .loupe-dot, .loupe-out .loupe-ring { opacity: 0; }
+
+/* ---------- Breadcrumb + sidebar ---------- */
+.crumb { display: flex; gap: 8px; align-items: baseline; font-size: 15px; color: var(--muted); margin: 0 0 8px; min-width: 0; }
+.crumb a:hover { color: var(--accent-text); }
+.crumb strong { font-weight: 400; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.article-layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 48px; align-items: start; }
+.article-layout.no-toc { grid-template-columns: minmax(0, 1fr); }
+.toc { position: sticky; top: 38vh; display: flex; flex-direction: column; gap: 2px; }
+.toc button { all: unset; display: flex; align-items: baseline; gap: 10px; padding: 3px 0; font-size: 14.5px; line-height: 1.35;
+  color: var(--muted); opacity: .75; position: relative; transition: color .2s, opacity .2s; }
+.toc button .n { font-size: 11px; font-variant-numeric: tabular-nums; width: 16px; flex: none; opacity: .8; }
+.toc button::before { content: ""; position: absolute; left: -16px; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%;
+  background: var(--accent); transform: scale(0); transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+.toc button:hover { color: var(--fg); opacity: 1; }
+.toc button.on { color: var(--accent-text); opacity: 1; }
+.toc button.on::before { transform: scale(1); }
+.toc button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 860px) {
+  .article-layout { grid-template-columns: minmax(0, 1fr); }
+  .toc { display: none; }
+}

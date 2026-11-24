@@ -79,8 +79,10 @@
     const list = posts.filter((x) => x.section === key);
     const next = list[(list.indexOf(p) + 1) % list.length];
     const hero = SECTIONS[key].layout === "gallery" ? `<div class="hero"><div class="cover">${cover(p)}</div></div>` : "";
-    app.innerHTML = `<article class="article">
-      <a class="back" href="#/${key}">← ${SECTIONS[key].title}</a>
+    app.innerHTML = `<nav class="crumb"><a href="#/${key}">← ${SECTIONS[key].title}</a><span>/</span><strong>${esc(p.title)}</strong></nav>
+    <div class="article-layout">
+    <aside class="toc" aria-label="On this page"></aside>
+    <article class="article" id="top">
       <div class="article-meta">No. ${p.no} · ${fmtDate(p.date)}${p.readTime ? ` · ${esc(p.readTime)}` : ""}${(p.tags || []).length ? ` · ${p.tags.map(esc).join(", ")}` : ""}</div>
       <h1>${esc(p.title)}</h1>
       <p class="lede">${esc(p.summary)}</p>
@@ -88,8 +90,31 @@
       <div class="prose">${marked.parse(md)}</div>
       ${next && next !== p ? `<a class="next" href="#/${key}/${next.slug}"><span>Next story</span><strong>${esc(next.title)} →</strong></a>` : ""}
       ${key === "memos" ? `<p class="disclaimer">These are personal views for discussion only and are not investment advice. I may hold positions in securities mentioned.</p>` : ""}
-    </article>`;
+    </article></div>`;
     window.scrollTo(0, 0);
+    buildToc();
+  }
+
+  // ---------- Sidebar table of contents with scroll-spy ----------
+  function buildToc() {
+    const toc = app.querySelector(".toc"); const heads = [...app.querySelectorAll(".prose h2")];
+    if (!toc || heads.length < 2) { toc && toc.remove(); app.querySelector(".article-layout")?.classList.add("no-toc"); return; }
+    const targets = [app.querySelector("#top"), ...heads];
+    toc.innerHTML = targets.map((h, i) => `<button type="button" data-t="${i}">${i ? `<span class="n">${String(i).padStart(2, "0")}</span>` : `<span class="n"></span>`}${i ? esc(h.textContent) : "Overview"}</button>`).join("");
+    const btns = [...toc.querySelectorAll("button")];
+    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    btns.forEach((b) => b.addEventListener("click", () => {
+      const t = targets[+b.dataset.t]; const y = t.getBoundingClientRect().top + scrollY - (+b.dataset.t ? 24 : 120);
+      scrollTo({ top: Math.max(0, y), behavior: still ? "auto" : "smooth" });
+    }));
+    const spy = () => {
+      if (!toc.isConnected) return removeEventListener("scroll", spy);
+      const line = Math.min(innerHeight * 0.3, 160); let cur = 0;
+      heads.forEach((h, i) => { if (h.getBoundingClientRect().top < line) cur = i + 1; });
+      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) cur = targets.length - 1;
+      btns.forEach((b, i) => b.classList.toggle("on", i === cur));
+    };
+    addEventListener("scroll", spy, { passive: true }); spy();
   }
 
   // ---------- Shelf ----------
