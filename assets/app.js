@@ -65,7 +65,7 @@
       const w = i + 1, n = String(w).padStart(2, "0"), p = byWeek[w];
       if (p) return `<a class="frame done" href="#/concepts/${p.slug}">
           <span class="shot">${cover(p)}<span class="view"><i></i>View concept</span></span>
-          <span class="cap"><span class="ct">${esc(p.title)}</span><em>${esc(p.blurb || p.summary)}</em></span>
+          <span class="cap"><span class="ct">${esc(p.title)}</span></span>
         </a>`;
       return `<span class="frame ${w === next ? "up" : "later"}"><span class="shot"></span><span class="cap">${w === next ? `<i></i>Week ${n} <em>/ Up next</em>` : `<em>Week ${n}</em>`}</span></span>`;
     }).join("");
