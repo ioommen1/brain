@@ -4,7 +4,14 @@
     "intro": [
       "Product concepts, short thoughts, and investment memos. Fewer pieces, made carefully. If one sparks something, <a href=\"#/about\">say hello</a>."
     ],
-    "now": "Now: planning Season 1, a run of weekly product concepts."
+    "now": "Now: planning Season 01. Twelve weeks, twelve longevity concepts.",
+    "eyebrow": "Isaac Oommen · Product, markets, longevity",
+    "season": {
+      "label": "Season 01",
+      "theme": "Longevity",
+      "weeks": 12,
+      "week": 0
+    }
   },
   "posts": [
     {

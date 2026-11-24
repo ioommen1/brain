@@ -2,9 +2,9 @@
 (function () {
   const app = document.getElementById("app");
   const SECTIONS = {
-    concepts: { title: "Concepts", layout: "gallery" },
-    thoughts: { title: "Thoughts", layout: "notes" },
-    memos: { title: "Memos", layout: "gallery" },
+    concepts: { title: "Concepts", layout: "gallery", blurb: "Small problems I noticed, and the products I'd build to fix them." },
+    thoughts: { title: "Thoughts", layout: "notes", blurb: "Short notes on products, markets, and what I'm learning." },
+    memos: { title: "Memos", layout: "gallery", blurb: "How I'd underwrite a company: thesis, risks, and what it's worth." },
   };
   // Muted palette for generated covers (used when a post has no "cover" image)
   const PALETTE = [
@@ -41,32 +41,75 @@
     </div>`;
   }
 
-  const card = (p) => `<a class="card" href="#/${p.section}/${p.slug}">
-      <div class="cover">${cover(p)}</div>
-      <div class="title"><span class="no">${p.no}</span>${esc(p.title)}</div>
-      <div class="sub">${esc(p.subtitle || p.summary)}</div>
+  const LETTER = { concepts: "C", thoughts: "T", memos: "M" };
+  const KIND = { concepts: "Concept", thoughts: "Thought", memos: "Memo" };
+  const code = (p) => `${LETTER[p.section]}–${p.no}`;
+  const shortDate = (d) => new Date(d + "T00:00:00").toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase();
+
+  const row = (p) => `<a class="row" href="#/${p.section}/${p.slug}" data-slug="${p.section}/${p.slug}">
+      <span class="r-no mono">${code(p)}</span>
+      <span class="r-thumb">${cover(p)}</span>
+      <span class="r-main"><span class="r-title">${esc(p.title)}</span><span class="r-sum">${esc(p.subtitle || p.summary)}</span></span>
+      <span class="r-kind mono">${esc(p.ticker || p.status || KIND[p.section])}</span>
+      <span class="r-date mono">${shortDate(p.date)}</span>
     </a>`;
 
-  const note = (p) => `<li><a href="#/${p.section}/${p.slug}">
-      <span><span class="t"><span class="no">${p.no}</span>${esc(p.title)}</span><span class="s">${esc(p.summary)}</span></span>
-      <span class="d">${fmtDate(p.date)}</span></a></li>`;
+  function seasonStrip() {
+    const S = site.season; if (!S) return "";
+    const cells = Array.from({ length: S.weeks }, (_, i) => {
+      const n = String(i + 1).padStart(2, "0");
+      const state = i < S.week ? "done" : i === S.week ? "up" : "";
+      return `<span class="wk ${state}" title="Week ${n}${state === "up" ? " · up next" : ""}"><i>${n}</i></span>`;
+    }).join("");
+    return `<div class="season">
+      <div class="season-head mono"><span>${esc(S.label)} · ${esc(S.theme)}</span><span>Week ${String(S.week).padStart(2, "0")} / ${S.weeks}</span></div>
+      <div class="weeks">${cells}</div>
+      ${site.now ? `<p class="now"><span class="dot"></span>${site.now}</p>` : ""}
+    </div>`;
+  }
 
-  function section(key, withIntro) {
-    const S = SECTIONS[key];
-    const items = posts.filter((p) => p.section === key);
-    const tags = [...new Set(items.flatMap((p) => p.tags || []))];
-    const render = (list) => S.layout === "gallery"
-      ? `<div class="gallery">${list.map(card).join("")}</div>`
-      : `<ul class="notes">${list.map(note).join("")}</ul>`;
-    app.innerHTML = `
-      ${withIntro ? `<section class="intro"><h1>${site.headline}</h1>${site.intro.map((p) => `<p>${p}</p>`).join("")}${site.now ? `<p class="now"><span class="dot"></span>${site.now}</p>` : ""}</section>` : ""}
-      ${tags.length ? `<div class="filters"><button class="on" data-tag="">All</button>${tags.map((t) => `<button data-tag="${esc(t)}">${esc(t)}</button>`).join("")}</div>` : ""}
-      <div id="list">${render(items)}</div>`;
+  // keys: "" = everything (home), or a section key
+  function index(key) {
+    const items = key ? posts.filter((p) => p.section === key) : posts;
+    const groups = key
+      ? [["", "All"], ...[...new Set(items.flatMap((p) => p.tags || []))].map((t) => [t, t])]
+      : [["", "All"], ...Object.keys(SECTIONS).map((k) => [k, SECTIONS[k].title])];
+    const count = (g) => !g ? items.length : items.filter((p) => key ? (p.tags || []).includes(g) : p.section === g).length;
+    const head = key
+      ? `<section class="page-top"><div class="eyebrow mono">${esc(SECTIONS[key].title)} · ${String(items.length).padStart(2, "0")} entries</div><h1>${esc(SECTIONS[key].blurb || SECTIONS[key].title)}</h1></section>`
+      : `<section class="hero">
+          <div class="eyebrow mono">${esc(site.eyebrow || "")}</div>
+          <h1>${site.headline}</h1>
+          ${site.intro.map((p) => `<p class="lead">${p}</p>`).join("")}
+          ${seasonStrip()}
+        </section>`;
+    app.innerHTML = `${head}
+      <section class="index">
+        <div class="filters mono">${groups.map(([g, label], i) => `<button class="${i ? "" : "on"}" data-g="${esc(g)}">${esc(label)}<sup>${String(count(g)).padStart(2, "0")}</sup></button>`).join("")}</div>
+        <div class="rows" id="list">${items.map(row).join("")}</div>
+      </section>`;
     app.querySelectorAll(".filters button").forEach((b) => b.addEventListener("click", () => {
       app.querySelectorAll(".filters button").forEach((x) => x.classList.toggle("on", x === b));
-      const t = b.dataset.tag;
-      document.getElementById("list").innerHTML = render(items.filter((p) => !t || (p.tags || []).includes(t)));
+      const g = b.dataset.g;
+      document.getElementById("list").innerHTML = items.filter((p) => !g || (key ? (p.tags || []).includes(g) : p.section === g)).map(row).join("");
     }));
+  }
+
+  // Floating cover preview that follows the cursor over index rows (desktop)
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    const pv = document.createElement("div"); pv.className = "peek"; document.body.appendChild(pv);
+    let cur = "";
+    addEventListener("mousemove", (e) => {
+      const r = e.target.closest && e.target.closest(".row");
+      if (!r) { pv.classList.remove("show"); cur = ""; return; }
+      if (r.dataset.slug !== cur) {
+        cur = r.dataset.slug; const [sec, slug] = cur.split("/");
+        const p = posts.find((x) => x.section === sec && x.slug === slug); pv.innerHTML = p ? cover(p) : "";
+      }
+      pv.style.transform = `translate(${e.clientX + 28}px, ${e.clientY - 90}px)`;
+      pv.classList.add("show");
+    });
+    addEventListener("hashchange", () => pv.classList.remove("show"));
   }
 
   async function article(key, slug) {
@@ -76,19 +119,16 @@
     const memo = p.memo
       ? `<div class="memo-box">${Object.entries(p.memo).map(([k, v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`
       : "";
-    const list = posts.filter((x) => x.section === key);
-    const next = list[(list.indexOf(p) + 1) % list.length];
     const hero = SECTIONS[key].layout === "gallery" ? `<div class="hero"><div class="cover">${cover(p)}</div></div>` : "";
     app.innerHTML = `<nav class="crumb"><a href="#/${key}">← ${SECTIONS[key].title}</a><span>/</span><strong>${esc(p.title)}</strong></nav>
     <div class="article-layout">
     <aside class="toc" aria-label="On this page"></aside>
     <article class="article" id="top">
-      <div class="article-meta">No. ${p.no} · ${fmtDate(p.date)}${p.readTime ? ` · ${esc(p.readTime)}` : ""}${(p.tags || []).length ? ` · ${p.tags.map(esc).join(", ")}` : ""}</div>
+      <div class="spec mono"><span><b>Entry</b>${code(p)}</span><span><b>Filed</b>${shortDate(p.date)}</span>${(p.status || p.ticker) ? `<span><b>${p.ticker ? "Ticker" : "Status"}</b>${esc(p.status || p.ticker)}</span>` : ""}${p.readTime ? `<span><b>Read</b>${esc(p.readTime)}</span>` : ""}</div>
       <h1>${esc(p.title)}</h1>
       <p class="lede">${esc(p.summary)}</p>
       ${hero}${memo}
       <div class="prose">${marked.parse(md)}</div>
-      ${next && next !== p ? `<a class="next" href="#/${key}/${next.slug}"><span>Next story</span><strong>${esc(next.title)} →</strong></a>` : ""}
       ${key === "memos" ? `<p class="disclaimer">These are personal views for discussion only and are not investment advice. I may hold positions in securities mentioned.</p>` : ""}
     </article></div>`;
     window.scrollTo(0, 0);
@@ -100,7 +140,7 @@
     const toc = app.querySelector(".toc"); const heads = [...app.querySelectorAll(".prose h2")];
     if (!toc || heads.length < 2) { toc && toc.remove(); app.querySelector(".article-layout")?.classList.add("no-toc"); return; }
     const targets = [app.querySelector("#top"), ...heads];
-    toc.innerHTML = targets.map((h, i) => `<button type="button" data-t="${i}">${i ? `<span class="n">${String(i).padStart(2, "0")}</span>` : `<span class="n"></span>`}${i ? esc(h.textContent) : "Overview"}</button>`).join("");
+    toc.innerHTML = targets.map((h, i) => `<button type="button" data-t="${i}">${i ? esc(h.textContent) : "Overview"}</button>`).join("");
     const btns = [...toc.querySelectorAll("button")];
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
     btns.forEach((b) => b.addEventListener("click", () => {
@@ -199,13 +239,13 @@
 
   function route() {
     const [, key, slug] = (location.hash.replace(/^#/, "") || "/").split("/");
-    const active = key || "concepts";
+    const active = key || "";
     document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("active", a.dataset.nav === active));
-    if (!key) section("concepts", true);
+    if (!key) index("");
     else if (key === "about") about();
     else if (key === "shelf") shelf();
     else if (SECTIONS[key] && slug) article(key, slug);
-    else if (SECTIONS[key]) section(key, false);
+    else if (SECTIONS[key]) index(key);
     else notFound();
   }
 
