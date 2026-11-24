@@ -3,19 +3,19 @@
   --fg: #1c1c1e;
   --muted: #8e8e93;
   --faint: #e1e1e6;
-  --accent: #ff9500;      /* iPhone system orange: fills, chips, covers */
-  --accent-text: #f07800; /* a touch deeper so small orange text stays readable */
+  --accent: #d9622b;
+  --accent-text: #d9622b;
   --card: #e9e9ee;
   --on-accent: #ffffff;
   --sans: "Inter", system-ui, -apple-system, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #000000; --fg: #f2f2f7; --muted: #8e8e93; --faint: #2c2c2e; --accent: #ff9f0a; --accent-text: #ff9f0a; --card: #1c1c1e; --on-accent: #1c1c1e;
+    --bg: #000000; --fg: #f2f2f7; --muted: #8e8e93; --faint: #2c2c2e; --accent: #ec7a45; --accent-text: #ec7a45; --card: #1c1c1e; --on-accent: #ffffff;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #000000; --fg: #f2f2f7; --muted: #8e8e93; --faint: #2c2c2e; --accent: #ff9f0a; --accent-text: #ff9f0a; --card: #1c1c1e; --on-accent: #1c1c1e;
+  --bg: #000000; --fg: #f2f2f7; --muted: #8e8e93; --faint: #2c2c2e; --accent: #ec7a45; --accent-text: #ec7a45; --card: #1c1c1e; --on-accent: #ffffff;
 }
 
 * { box-sizing: border-box; }
@@ -51,7 +51,7 @@ main { min-height: 60vh; padding: 32px 0 64px; }
 .now { display: inline-flex; align-items: center; gap: 10px; margin-top: 12px !important; font-size: 14px !important; color: var(--fg) !important;
   background: var(--card); padding: 6px 14px 6px 12px; border-radius: 999px; }
 .now .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 0 var(--accent); animation: pulse 2.4s infinite; }
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,149,0,.5); } 70% { box-shadow: 0 0 0 8px rgba(255,149,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,149,0,0); } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(217,98,43,.5); } 70% { box-shadow: 0 0 0 8px rgba(217,98,43,0); } 100% { box-shadow: 0 0 0 0 rgba(217,98,43,0); } }
 @media (prefers-reduced-motion: reduce) { .now .dot { animation: none; } }
 .no { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .82em; margin-right: 10px; }
 .intro p { color: var(--muted); margin: 0 0 8px; }
