@@ -1,0 +1,65 @@
+{
+  "site": {
+    "headline": "I think about <em>products</em>, <em>markets</em>, and the space where they meet.",
+    "intro": [
+      "Hi, I'm Paul. This is where I write down product ideas, half-formed thoughts, and investment memos so I can see whether they hold up.",
+      "Most of it is a work in progress. If something here sparks an idea, <a href=\"#/about\">reach out</a>."
+    ]
+  },
+  "posts": [
+    {
+      "section": "concepts",
+      "slug": "receipts-for-everything",
+      "title": "Receipts for Everything",
+      "date": "2026-11-10",
+      "status": "Exploring",
+      "tags": ["Consumer", "Fintech"],
+      "readTime": "5 min read",
+      "summary": "A single inbox that turns every purchase into a structured, searchable record for warranties, returns, and budgeting."
+    },
+    {
+      "section": "concepts",
+      "slug": "ai-chief-of-staff",
+      "title": "An AI Chief of Staff for Small Teams",
+      "date": "2026-10-02",
+      "status": "Sketch",
+      "tags": ["AI", "B2B"],
+      "readTime": "6 min read",
+      "summary": "What if a 10-person company had the operating rhythm of a 1,000-person one, without hiring an ops team?"
+    },
+    {
+      "section": "thoughts",
+      "slug": "distribution-is-the-moat",
+      "title": "In AI, Distribution Is the Moat (For Now)",
+      "date": "2026-11-18",
+      "tags": ["AI", "Strategy"],
+      "readTime": "3 min read",
+      "summary": "When models commoditize, the winners are the ones who already own the workflow."
+    },
+    {
+      "section": "thoughts",
+      "slug": "writing-to-think",
+      "title": "Writing to Think",
+      "date": "2026-09-14",
+      "tags": ["Meta"],
+      "readTime": "2 min read",
+      "summary": "Why I publish half-finished ideas, and what I hope to get out of it."
+    },
+    {
+      "section": "memos",
+      "slug": "sample-memo-vertical-saas",
+      "title": "Sample Memo: A Vertical SaaS Roll-Up",
+      "date": "2026-11-01",
+      "ticker": "Template",
+      "tags": ["Software", "Private"],
+      "readTime": "8 min read",
+      "summary": "A worked template for how I structure an investment memo: thesis, market, unit economics, risks, and valuation.",
+      "memo": {
+        "Stance": "Long",
+        "Type": "Private / Hypothetical",
+        "Horizon": "3 to 5 years",
+        "Conviction": "Medium"
+      }
+    }
+  ]
+}
