@@ -1,4 +1,4 @@
-I'm Paul. I'm interested in how great products get built and how to tell, early, which ones will become great businesses.
+I'm Isaac. I'm interested in how great products get built and how to tell, early, which ones will become great businesses.
 
 This site has three parts:
 
