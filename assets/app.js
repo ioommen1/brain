@@ -92,6 +92,56 @@
     window.scrollTo(0, 0);
   }
 
+  // ---------- Shelf ----------
+  async function shelf() {
+    const data = await fetch("content/shelf.json").then((r) => r.json()).catch(() => null);
+    if (!data) return notFound();
+    const cover = (it, cls) => it.cover
+      ? `<img class="${cls}" src="${esc(it.cover)}" alt="${esc(it.title)}" loading="lazy">`
+      : `<div class="${cls} gen" style="--c:${esc(it.color || "#8d8c88")};--ink:${esc(it.ink || "#fff")}"><span class="gt">${esc(it.title)}</span><span class="gb">${esc(it.by)}</span></div>`;
+    const item = {
+      cd: (it, i) => `<button class="cd" data-i="${i}" aria-label="${esc(it.title)} by ${esc(it.by)}">
+          <span class="disc"></span><span class="case">${cover(it, "art")}<span class="hinge"></span><span class="gloss"></span></span></button>`,
+      book: (it, i) => {
+        const h = 78 + ((it.title.length * 7) % 22); const w = 34 + Math.min(it.title.length, 28);
+        return `<button class="book" data-i="${i}" style="--c:${esc(it.color || "#8d8c88")};--ink:${esc(it.ink || "#fff")};height:${h}%;width:${w}px" aria-label="${esc(it.title)} by ${esc(it.by)}">
+          <span class="spine-t">${esc(it.title)}</span><span class="spine-b">${esc(it.by.split(" ").pop())}</span></button>`;
+      },
+      paper: (it) => {
+        const shot = it.cover
+          ? `<img src="${esc(it.cover)}" alt="First page of ${esc(it.title)}" loading="lazy">`
+          : `<div class="page"><div class="pt">${esc(it.title)}</div><div class="pa">${esc(it.by)}</div><div class="ab">ABSTRACT</div>${[92, 100, 96, 100, 88, 97, 70].map((w) => `<div class="ln" style="width:${w}%"></div>`).join("")}</div>`;
+        const link = it.link ? `href="${esc(it.link)}" target="_blank" rel="noopener"` : "";
+        return `<article class="paper">
+          <a class="shot" ${link}>${shot}</a>
+          <div class="meta">${esc(it.by)}${it.venue ? ` · ${esc(it.venue)}` : ""}${it.year ? ` · ${it.year}` : ""}</div>
+          <h3>${esc(it.title)}</h3>
+          <p class="thoughts">${it.note ? esc(it.note) : "<em>My thoughts on this paper go here.</em>"}</p>
+          ${it.link ? `<a class="read" ${link}>Read the paper ↗</a>` : ""}
+        </article>`;
+      },
+      film: (it, i) => `<button class="film" data-i="${i}" aria-label="${esc(it.title)} by ${esc(it.by)}">${cover(it, "poster")}</button>`,
+    };
+    app.innerHTML = `<section class="intro shelf-intro"><h1>Shelf</h1><p>${esc(data.intro)}</p></section>
+      ${data.rows.map((r) => `<section class="shelf-row" data-row="${esc(r.key)}">
+        <div class="row-head"><span>${esc(r.title)}</span><span class="count">${r.items.length}</span></div>
+        <div class="rack rack-${r.kind}">${r.items.map(item[r.kind]).join("")}</div>
+        <div class="detail" aria-live="polite"></div>
+      </section>`).join("")}`;
+    app.querySelectorAll(".shelf-row").forEach((rowEl, ri) => {
+      const row = data.rows[ri]; const detail = rowEl.querySelector(".detail");
+      rowEl.querySelectorAll("[data-i]").forEach((b) => b.addEventListener("click", () => {
+        const on = b.classList.contains("on");
+        rowEl.querySelectorAll("[data-i]").forEach((x) => x.classList.remove("on"));
+        if (on) { detail.innerHTML = ""; return; }
+        b.classList.add("on");
+        const it = row.items[+b.dataset.i];
+        detail.innerHTML = `<div class="detail-in"><strong>${esc(it.title)}</strong><span>${esc(it.by)}${it.year ? ` · ${it.year}` : ""}</span>
+          <p>${it.note ? esc(it.note) : `<em>A line on why this one stuck goes here.</em>`}</p></div>`;
+      }));
+    });
+  }
+
   async function about() {
     const md = await fetch("content/about.md").then((r) => r.text()).catch(() => "");
     app.innerHTML = `<article class="article"><h1>About</h1><div class="prose">${marked.parse(md)}</div></article>`;
@@ -115,6 +165,7 @@
     document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("active", a.dataset.nav === active));
     if (!key) section("concepts", true);
     else if (key === "about") about();
+    else if (key === "shelf") shelf();
     else if (SECTIONS[key] && slug) article(key, slug);
     else if (SECTIONS[key]) section(key, false);
     else notFound();

@@ -20,3 +20,10 @@ Then open http://localhost:8000.
 ## Publish for free with GitHub Pages
 
 Repo Settings → Pages → Deploy from branch → pick the branch and `/ (root)`. Your site appears at `https://<username>.github.io/<repo>/`. You can attach a custom domain in the same screen.
+
+## Shelf (music, books, papers, films)
+
+Edit `content/shelf.json`. Each row has a `kind`: `cd`, `book`, `paper` or `film`. Each item takes `title`, `by`, `year`, `note` (your line on why it stuck), and optionally `color` / `ink` for the generated cover or spine.
+
+- **Real covers:** put an image in `content/img/shelf/` and set `"cover": "content/img/shelf/name.jpg"` (square for CDs, 2:3 for films).
+- **Papers:** also take `venue` and `link`. For the rounded screenshot, save a crop of the paper's first page (title + abstract, roughly 4:3) to `content/img/shelf/` and set it as `cover`. The rounded corners and shadow are added automatically.
