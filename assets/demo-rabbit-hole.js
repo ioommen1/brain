@@ -44,6 +44,7 @@
   const ic = (n, cls = "", fill = false) => `<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true" ${fill ? 'fill="currentColor" stroke="none"' : 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"'}>${I[n]}</svg>`;
 
   function mount(el) {
+    let menuAt = { x: 0, y: 0 }, coached = false;
     let trail = [{ ...START }], mode = "album", branch = 0, menu = false, saved = false, playing = true, toast = "";
     let shuffle = true, repeat = false, vol = 0.7, pos = 43;
     const liked = new Set([START.title]);
@@ -90,7 +91,8 @@
              <div class="dk-hero-txt"><small>Album</small><div class="dk-title">${esc(START.title)}</div><span>${esc(START.artist)} · 2024 · 4 songs</span></div>
            </div>
            <div class="dk-bar"><button type="button" class="dk-bigplay" aria-label="${playing ? "Pause" : "Play"}">${ic(playing ? "pause" : "play", "", !playing)}</button>
-             <span class="dk-tip">Open ⋯ on the right to find the new option</span></div>
+             <button type="button" class="dk-ib dk-more2${coached ? "" : " hint"}" aria-label="More options for ${esc(START.title)}">${ic("more", "", true)}</button>
+             ${coached ? "" : `<span class="dk-coach" role="note"><b>New</b>Go down the rabbit hole from any song</span>`}</div>
            <div class="dk-table">${ALBUM.map((x, i) => `<button type="button" class="dk-row dk-arow${x.title === cur.title ? " on" : ""}" data-a="${i}"><span class="n">${x.title === cur.title && playing ? '<i class="eq"><b></b><b></b><b></b></i>' : i + 1}</span>
                <span class="t"><b>${esc(x.title)}</b><small>${esc(x.artist)}</small></span><span class="d">${dur(x.title)}</span></button>`).join("")}</div>`;
 
@@ -104,13 +106,6 @@
             ${art(cur, "big")}
             <div class="dk-np"><span><b>${esc(cur.title)}</b><small>${esc(cur.artist)}</small></span><button type="button" class="dk-ok${liked.has(cur.title) ? "" : " off"}" aria-label="${liked.has(cur.title) ? "Remove from" : "Save to"} Liked Songs">${ic(liked.has(cur.title) ? "check" : "plus")}</button></div>
             ${rh ? `<div class="dk-card"><small>Up next</small><span>One step further from ${esc(cur.genre)}</span></div>` : ""}
-            ${menu ? `<div class="dk-menu" role="menu">
-              <button type="button" role="menuitem" class="dk-mi">${ic("plus")}Add to playlist</button>
-              <button type="button" role="menuitem" class="dk-mi">${ic("queue")}Add to queue</button>
-              <button type="button" role="menuitem" class="dk-mi">${ic("radio")}Go to song radio</button>
-              <button type="button" role="menuitem" class="dk-mi dk-new">${ic("hole")}Go down the rabbit hole<em>New</em></button>
-              <button type="button" role="menuitem" class="dk-mi">${ic("share")}Share</button>
-            </div>` : ""}
           </div>
         </div>
         <div class="dk-player">
@@ -127,11 +122,26 @@
           </div>
           <div class="dk-vol"><button type="button" class="dk-ib dk-q" aria-label="Queue">${ic("queue")}</button><span class="dk-track sm dk-volbar" role="slider" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(vol * 100)}"><i style="width:${vol * 100}%"></i></span></div>
         </div>
+            ${menu ? `<div class="dk-menu" role="menu" style="left:${menuAt.x}px;top:${menuAt.y}px">
+              <button type="button" role="menuitem" class="dk-mi">${ic("plus")}Add to playlist</button>
+              <button type="button" role="menuitem" class="dk-mi">${ic("queue")}Add to queue</button>
+              <button type="button" role="menuitem" class="dk-mi">${ic("radio")}Go to song radio</button>
+              <button type="button" role="menuitem" class="dk-mi dk-new">${ic("hole")}Go down the rabbit hole<em>New</em></button>
+              <button type="button" role="menuitem" class="dk-mi">${ic("share")}Share</button>
+            </div>` : ""}
         ${toast ? `<div class="dk-toast">${esc(toast)}</div>` : ""}
       </div>`;
 
       const $ = (q) => el.querySelector(q);
-      $(".dk-more").addEventListener("click", (e) => { e.stopPropagation(); menu = !menu; render(); });
+      const openMenu = (e, anchor) => {
+        e.preventDefault(); e.stopPropagation();
+        const w = el.querySelector(".dk-win").getBoundingClientRect(), r = anchor ? anchor.getBoundingClientRect() : { left: e.clientX, right: e.clientX, bottom: e.clientY };
+        const x = Math.min(Math.max(8, (anchor ? r.left : r.left) - w.left), w.width - 232), y = Math.min((anchor ? r.bottom + 6 : r.bottom) - w.top, w.height - 250);
+        menuAt = { x, y }; menu = true; coached = true; render();
+      };
+      $(".dk-more").addEventListener("click", (e) => menu ? (menu = false, render()) : openMenu(e, e.currentTarget));
+      const m2 = $(".dk-more2"); if (m2) m2.addEventListener("click", (e) => menu ? (menu = false, render()) : openMenu(e, e.currentTarget));
+      el.querySelectorAll(".dk-row").forEach((r) => r.addEventListener("contextmenu", (e) => openMenu(e, null)));
       el.querySelectorAll(".dk-mi:not(.dk-new)").forEach((b) => b.addEventListener("click", () => { menu = false; render(); }));
       const nw = $(".dk-new"); if (nw) nw.addEventListener("click", () => {
         menu = false; mode = "rabbit"; pos = 0; trail = [trail[trail.length - 1]]; seen.clear(); seen.add(trail[0].title); saved = false; playing = true; flash("Rabbit hole started. Press next.");

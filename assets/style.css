@@ -887,3 +887,13 @@ div.dk-row { grid-template-columns: 26px minmax(0, 1fr) 40px; }
 .dk-seek:hover i, .dk-volbar:hover i { background: var(--g); }
 .dk-seek i { transition: none; }
 .dk-ib.on::before { content: ""; position: absolute; left: 50%; bottom: -6px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--g); }
+.dk-menu { top: auto; right: auto; }
+.dk-more2 { color: var(--t2); width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; }
+.dk-more2 .ic { width: 22px; height: 22px; }
+.dk-more2.hint { color: #fff; } .dk-more2.hint::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid var(--g); animation: ring 1.8s ease-out infinite; }
+.dk-coach { position: relative; display: inline-flex; align-items: center; gap: 8px; margin-left: 6px; background: #fff; color: #000; font-size: 12.5px; font-weight: 600; padding: 7px 12px; border-radius: 8px; animation: fade .3s ease both; }
+.dk-coach::before { content: ""; position: absolute; left: -5px; top: 50%; width: 10px; height: 10px; margin-top: -5px; background: #fff; transform: rotate(45deg); }
+.dk-coach b { background: var(--g); color: #000; font-size: 10.5px; padding: 1px 6px; border-radius: 3px; }
+@media (max-width: 720px) { .dk-coach { font-size: 11.5px; } }
+.dk-row.dk-arow { grid-template-columns: 26px minmax(0, 1fr) 40px; }
+@media (max-width: 720px) { .dk-row.dk-arow { grid-template-columns: 22px minmax(0, 1fr) 36px; } }
