@@ -31,6 +31,11 @@
 
   function cover(p) {
     if (p.cover) return `<img src="${esc(p.cover)}" alt="" loading="lazy">`;
+    if (p.anim) {
+      const kick = typeLabel(p) || p.ticker || p.status || "";
+      return `<div class="art live" data-anim="${esc(p.anim)}"><canvas aria-hidden="true"></canvas>
+        <span class="kicker" style="position:relative">${esc(kick)}</span><span class="mark" style="position:relative">${esc(p.mark || p.title)}</span></div>`;
+    }
     const h = hash(p.slug);
     const [a, b] = PALETTE[p.palette ?? h % PALETTE.length];
     const kicker = typeLabel(p) || p.ticker || p.status || "";
@@ -73,7 +78,7 @@
   // keys: "" = home, or a section key
   function index(key) {
     if (key === "concepts") {
-      app.innerHTML = `<section class="page-top"><h1>${esc(SECTIONS.concepts.blurb)}</h1></section>${wall()}`;
+      app.innerHTML = `<section class="page-top"><h1>${esc(SECTIONS.concepts.blurb)}</h1><p class="sub">I'm challenging myself to one app, one day a week.</p></section>${wall()}`;
       return;
     }
     const items = key ? posts.filter((p) => p.section === key) : posts.filter((p) => p.section !== "concepts");
@@ -174,6 +179,10 @@
         const w = 150 + (h % 50);
         return `<button class="sp paper" data-i="${i}" style="width:${w}px" aria-label="${esc(it.title)}"><span>${esc(it.title)}</span></button>`;
       }
+      if (kind === "recipe") {
+        const ht = 78 + (h % 26);
+        return `<button class="sp recipe" data-i="${i}" style="--c:${tint(it.color)};height:${ht}px" aria-label="${esc(it.title)} recipe"><span>${esc(it.title)}</span></button>`;
+      }
       if (kind === "cd") return `<button class="sp cd" data-i="${i}" style="--c:${tint(it.color)}" aria-label="${esc(it.title)} by ${esc(it.by)}"><span class="t">${esc(it.title)}</span></button>`;
       if (kind === "film") return `<button class="sp film" data-i="${i}" style="--c:${tint(it.color)}" aria-label="${esc(it.title)}"><span class="t">${esc(it.title)}</span><i class="dot"></i></button>`;
       const w = Math.round(24 + Math.min(it.pages || 300, 640) / 640 * 26);
@@ -186,9 +195,11 @@
       const books = keys.filter((k) => rows[k] && rows[k].kind === "book").flatMap((k) => rows[k].items);
       const stand = keys.filter((k) => rows[k] && ["cd", "film"].includes(rows[k].kind));
       const flat = keys.filter((k) => rows[k] && rows[k].kind === "paper").flatMap((k) => rows[k].items);
+      const cards = keys.filter((k) => rows[k] && rows[k].kind === "recipe").flatMap((k) => rows[k].items);
       let html = books.map((it) => spine(it, "book")).join("");
       stand.forEach((k, n) => { if (n || books.length) html += `<span class="gap"></span>`; html += rows[k].items.map((it) => spine(it, rows[k].kind)).join(""); });
       if (flat.length) html += `<span class="gap"></span><span class="stack">${flat.map((it) => spine(it, "paper")).join("")}</span>`;
+      if (cards.length) html += `<span class="gap"></span><span class="rbox"><span class="cards">${cards.map((it) => spine(it, "recipe")).join("")}</span><span class="box">Recipes</span></span>`;
       return `<section class="shelf-unit" data-s="${si}">
         <div class="ledge"><div class="row-of">${html}</div></div>
         <div class="plank"></div>
@@ -196,12 +207,23 @@
       </section>`;
     };
 
-    app.innerHTML = `${(data.shelves || data.rows.map((r) => [r.key])).map(shelfHtml).join("")}`;
+    const log = (data.log || []).slice().sort((a, b) => b.date.localeCompare(a.date));
+    const logHtml = log.length ? `<section class="log"><div class="label">Everything else</div><ul class="ideas">${log.map((x) => `<li>
+        <span class="i-date mono">${shortDate(x.date)}</span>
+        <span class="i-main"><span class="i-title">${esc(x.title)}</span><span class="i-note">${esc([x.by, x.type].filter(Boolean).join(" · "))}</span></span>
+      </li>`).join("")}</ul></section>` : "";
+    app.innerHTML = `${(data.shelves || data.rows.map((r) => [r.key])).map(shelfHtml).join("")}${logHtml}`;
 
     const detail = (it) => {
+      if (it.kind === "recipe") return `<div class="pulled-in recipe-in"><div class="pv recipe-card" style="--c:${tint(it.color)}"><span>${esc(it.title)}</span><small>${esc(it.time || "")}</small></div><div class="pt">
+        <div class="eyebrow mono">Recipe${it.time ? ` · ${esc(it.time)}` : ""}</div><h3>${esc(it.title)}</h3><div class="by">${esc(it.by || "")}</div>
+        ${it.note ? `<p>${esc(it.note)}</p>` : ""}
+        ${it.ingredients ? `<div class="rc-cols"><div><div class="rc-h">Ingredients</div><ul>${it.ingredients.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>
+        ${it.steps ? `<div><div class="rc-h">Steps</div><ol>${it.steps.map((x) => `<li>${esc(x)}</li>`).join("")}</ol></div>` : ""}</div>` : ""}
+      </div><button class="close" aria-label="Put it back">Put back</button></div>`;
       const vis = it.kind === "paper"
         ? `<div class="pv paper-shot">${it.cover ? `<img src="${esc(it.cover)}" alt="">` : `<b>${esc(it.title)}</b><small>${esc(it.by)}</small>${[92, 100, 96, 100, 84, 97].map((w) => `<i style="width:${w}%"></i>`).join("")}`}</div>`
-        : `<div class="pv cover-${it.kind}" style="--c:${tint(it.color)};--ink:${it.ink || "#fff"}">${it.cover ? `<img src="${esc(it.cover)}" alt="">` : `<span>${esc(it.title)}</span><small>${esc(it.by)}</small>`}</div>`;
+        : `<div class="pv cover-${it.kind}${it.cover ? " has-img" : ""}" style="--c:${tint(it.color)};--ink:${it.ink || "#fff"}">${it.cover ? `<img src="${esc(it.cover)}" alt="">` : `<span>${esc(it.title)}</span><small>${esc(it.by)}</small>`}</div>`;
       const kindName = { book: "Book", cd: "Album", film: "Film", paper: "Paper" }[it.kind];
       return `<div class="pulled-in">${vis}<div class="pt">
         <div class="eyebrow mono">${kindName}${it.year ? ` · ${it.year}` : ""}${it.venue ? ` · ${esc(it.venue)}` : ""}</div>
@@ -272,6 +294,50 @@
       if (t) dot.style.setProperty("--caret", Math.round(parseFloat(getComputedStyle(t).fontSize) * 1.25) + "px");
     });
   }
+
+  // ---------- Living covers: looping canvas animations, like a Spotify Canvas ----------
+  const ANIMS = {
+    // A tunnel of rings sinking inward, with a trail of dots heading down the hole
+    tunnel(ctx, w, h, t) {
+      const g = ctx.createLinearGradient(0, 0, w, h); g.addColorStop(0, "#22403a"); g.addColorStop(1, "#4f7469");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      const cx = w * 0.68, cy = h * 0.46, R = Math.hypot(w, h) * 0.75, N = 16;
+      for (let i = 0; i < N; i++) {
+        const k = ((i / N) + t * 0.06) % 1, e = k * k * k;
+        ctx.beginPath(); ctx.ellipse(cx + (1 - e) * w * 0.02, cy, R * e, R * e * 0.82, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(214, 236, 226, ${0.06 + e * 0.22})`; ctx.lineWidth = Math.max(0.6, e * 2.2); ctx.stroke();
+      }
+      const hole = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 0.08); hole.addColorStop(0, "rgba(8,20,17,.9)"); hole.addColorStop(1, "rgba(8,20,17,0)");
+      ctx.fillStyle = hole; ctx.beginPath(); ctx.arc(cx, cy, R * 0.08, 0, Math.PI * 2); ctx.fill();
+      for (let j = 0; j < 9; j++) {
+        const k = ((j / 9) + t * 0.09) % 1, e = 1 - k, a = j * 0.7 + t * 0.5;
+        const rr = R * 0.42 * e * e, x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr * 0.82;
+        ctx.beginPath(); ctx.arc(x, y, 1.2 + e * 5.5, 0, Math.PI * 2); ctx.fillStyle = `rgba(236, 122, 69, ${0.25 + e * 0.75})`; ctx.fill();
+      }
+    },
+  };
+  const live = new Set(); let rafOn = false; const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const io = "IntersectionObserver" in window ? new IntersectionObserver((es) => es.forEach((e) => e.target._vis = e.isIntersecting)) : null;
+  function startLive() {
+    document.querySelectorAll(".art.live canvas").forEach((c) => {
+      if (live.has(c)) return; live.add(c); c._vis = true; io && io.observe(c);
+    });
+    for (const c of live) if (!c.isConnected) { live.delete(c); io && io.unobserve(c); }
+    const frame = (ms) => {
+      const t = still ? 2 : ms / 1000;
+      for (const c of live) {
+        if (!c._vis || !c.isConnected) continue;
+        const r = c.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+        const W = Math.max(1, Math.round(r.width * dpr)), H = Math.max(1, Math.round(r.height * dpr));
+        if (c.width !== W || c.height !== H) { c.width = W; c.height = H; }
+        const f = ANIMS[c.parentElement.dataset.anim]; if (f) f(c.getContext("2d"), W, H, t);
+      }
+      if (still) { rafOn = false; return; }
+      requestAnimationFrame(frame);
+    };
+    if (!rafOn) { rafOn = true; requestAnimationFrame(frame); }
+  }
+  new MutationObserver(() => startLive()).observe(document.body, { childList: true, subtree: true });
 
   function route() {
     const [, key, slug] = (location.hash.replace(/^#/, "") || "/").split("/");

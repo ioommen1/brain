@@ -10,7 +10,8 @@
   --paper-opacity: 1;
   --chip: rgba(70, 55, 40, .055);
   --sans: "Inter", system-ui, -apple-system, sans-serif;
-  --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --serif: "Inter", system-ui, -apple-system, sans-serif;
+  --logo: "Instrument Serif", Georgia, serif;
   --accent-wash: rgba(217, 98, 43, .16);
 }
 @media (prefers-color-scheme: dark) {
@@ -547,3 +548,45 @@ a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color 
   .brand { display: block; font-family: var(--serif); font-size: 22px; color: var(--fg); flex-basis: 100%; }
   .site-header { flex-wrap: wrap; row-gap: 14px; }
 }
+
+/* ================= One sans typeface; serif only for the name ================= */
+.brand { font-family: var(--logo) !important; font-weight: 400; }
+.hero h1, .page-top h1, .article h1 { font-weight: 400; letter-spacing: -0.03em; }
+.hero h1 { font-size: clamp(30px, 4.4vw, 46px); line-height: 1.12; }
+.page-top h1 { font-size: clamp(26px, 3.4vw, 36px); line-height: 1.15; }
+.page-top .sub { color: var(--muted); margin: 10px 0 0; }
+.article h1 { font-size: clamp(30px, 4.2vw, 42px); line-height: 1.1; }
+.prose h3 { font-weight: 500; font-size: clamp(19px, 2vw, 22px); line-height: 1.35; letter-spacing: -0.015em; }
+.pt h3 { font-weight: 500; font-size: 22px; letter-spacing: -0.015em; }
+.wide-hero .art .mark, .frame .art .mark { font-weight: 500; letter-spacing: -0.03em; }
+.frame .art .mark { font-size: clamp(22px, 2.6vw, 32px); }
+.wide-hero .art .mark { font-size: clamp(26px, 4vw, 46px); }
+/* living covers */
+.art.live { background: #22403a; }
+.art.live canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.art.live .kicker, .art.live .mark { z-index: 1; }
+
+/* Real covers fill the frame */
+.pv.has-img { padding: 0; background: none; }
+/* Recipe box: index cards standing in a small wooden box */
+.rbox { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+.rbox .cards { display: flex; align-items: flex-end; gap: 3px; padding: 0 8px; margin-bottom: -46px; }
+.rbox .box { width: 128px; height: 58px; position: relative; z-index: 2; pointer-events: none; border-radius: 3px 3px 1px 1px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--wood) 85%, #fff), var(--wood) 30%, var(--wood-edge));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 10px -8px var(--spine-shadow);
+  display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(60,40,20,.55); }
+.recipe { width: 34px; background: var(--c); border-radius: 3px 3px 0 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+  background-image: repeating-linear-gradient(180deg, transparent 0 13px, rgba(120,90,60,.14) 13px 14px); display: flex; justify-content: center; padding-top: 6px; }
+.recipe span { writing-mode: vertical-rl; font-size: 9px; letter-spacing: .04em; color: #5a4a3a; white-space: nowrap; overflow: hidden; max-height: calc(100% - 50px); }
+.recipe:hover { transform: translateY(-8px); } .recipe.on { transform: translateY(-26px); }
+.pv.recipe-card { aspect-ratio: 5 / 3.4; width: 170px; background: var(--c); padding: 14px; display: flex; flex-direction: column; justify-content: space-between; color: #4a3c2e;
+  background-image: repeating-linear-gradient(180deg, transparent 0 17px, rgba(120,90,60,.16) 17px 18px); box-shadow: 0 14px 26px -16px var(--spine-shadow); }
+.pv.recipe-card span { font-weight: 500; font-size: 15px; } .pv.recipe-card small { font-size: 11px; opacity: .8; }
+.recipe-in { grid-template-columns: 170px minmax(0, 1fr) auto; }
+.rc-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 28px; margin-top: 16px; font-size: 14.5px; }
+.rc-h { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.rc-cols ul, .rc-cols ol { margin: 0; padding-left: 18px; } .rc-cols li { margin-bottom: 4px; }
+/* Everything else */
+.log { margin-top: 24px; }
+.log .label { font-size: 13px; color: var(--muted); padding-bottom: 12px; }
+@media (max-width: 640px) { .recipe-in { grid-template-columns: minmax(0, 1fr); } .pv.recipe-card { width: 100%; max-width: 220px; } .rc-cols { grid-template-columns: minmax(0, 1fr); } }

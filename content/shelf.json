@@ -40,44 +40,55 @@
           "title": "Outlive",
           "by": "Peter Attia",
           "year": 2023,
-          "color": "#e8e1d3",
-          "ink": "#3a3a38",
-          "pages": 496
+          "color": "#b4f1ee",
+          "ink": "#2f2c28",
+          "pages": 496,
+          "cover": "content/img/shelf/outlive.jpg"
         },
         {
           "title": "Creative Selection",
           "by": "Ken Kocienda",
           "year": 2018,
-          "color": "#3f5e57",
-          "pages": 272
+          "color": "#e65b25",
+          "pages": 272,
+          "cover": "content/img/shelf/creative-selection.jpg",
+          "ink": "#ffffff"
         },
         {
           "title": "The Design of Everyday Things",
           "by": "Don Norman",
           "year": 1988,
-          "color": "#d9622b",
-          "pages": 368
+          "color": "#f9df30",
+          "pages": 368,
+          "cover": "content/img/shelf/design-of-everyday-things.jpg",
+          "ink": "#2f2c28"
         },
         {
           "title": "Barbarians at the Gate",
           "by": "Burrough & Helyar",
           "year": 1989,
-          "color": "#2f2f2d",
-          "pages": 592
+          "color": "#ae2e28",
+          "pages": 592,
+          "cover": "content/img/shelf/barbarians-at-the-gate.jpg",
+          "ink": "#ffffff"
         },
         {
           "title": "The Mom Test",
           "by": "Rob Fitzpatrick",
           "year": 2013,
-          "color": "#c9a46a",
-          "pages": 136
+          "color": "#de1b6a",
+          "pages": 136,
+          "cover": "content/img/shelf/the-mom-test.jpg",
+          "ink": "#ffffff"
         },
         {
           "title": "Shoe Dog",
           "by": "Phil Knight",
           "year": 2016,
-          "color": "#8a5a76",
-          "pages": 400
+          "color": "#030001",
+          "pages": 400,
+          "cover": "content/img/shelf/shoe-dog.jpg",
+          "ink": "#ffffff"
         }
       ]
     },
@@ -132,6 +143,66 @@
           "color": "#b07a5a"
         }
       ]
+    },
+    {
+      "key": "recipes",
+      "title": "Cooking",
+      "kind": "recipe",
+      "items": [
+        {
+          "title": "Cacio e Pepe",
+          "by": "Classic Roman",
+          "time": "20 min",
+          "color": "#efe3c8",
+          "ingredients": [
+            "200g spaghetti",
+            "100g Pecorino Romano, finely grated",
+            "2 tsp black pepper, freshly cracked",
+            "Salt"
+          ],
+          "steps": [
+            "Toast the pepper in a dry pan.",
+            "Cook pasta in less water than usual so it gets starchy.",
+            "Mix cheese with a splash of pasta water into a paste.",
+            "Toss pasta with pepper, then the cheese paste, off the heat, adding water until glossy."
+          ]
+        },
+        {
+          "title": "Shakshuka",
+          "by": "North African",
+          "time": "30 min",
+          "color": "#f1d9c6",
+          "ingredients": [
+            "4 eggs",
+            "1 can crushed tomatoes",
+            "1 onion, 1 red pepper",
+            "2 cloves garlic",
+            "Cumin, paprika, chili"
+          ],
+          "steps": [
+            "Soften onion and pepper, then garlic and spices.",
+            "Add tomatoes and simmer until thick.",
+            "Make wells, crack in the eggs, cover until set."
+          ]
+        },
+        {
+          "title": "Miso Salmon",
+          "by": "Weeknight",
+          "time": "15 min",
+          "color": "#e4e7d6",
+          "ingredients": [
+            "2 salmon fillets",
+            "1 tbsp white miso",
+            "1 tsp honey",
+            "1 tsp soy sauce"
+          ],
+          "steps": [
+            "Mix miso, honey and soy.",
+            "Brush over salmon.",
+            "Broil 7 to 9 minutes until caramelized."
+          ]
+        }
+      ]
     }
   ],
   "shelves": [
@@ -139,7 +210,28 @@
       "reading",
       "listening",
       "watching",
-      "papers"
+      "papers",
+      "recipes"
     ]
+  ],
+  "log": [
+    {
+      "date": "2026-11-20",
+      "type": "Book",
+      "title": "Sample entry: a book I finished",
+      "by": "Author"
+    },
+    {
+      "date": "2026-11-14",
+      "type": "Film",
+      "title": "Sample entry: a film I watched",
+      "by": "Director"
+    },
+    {
+      "date": "2026-11-02",
+      "type": "Album",
+      "title": "Sample entry: an album on repeat",
+      "by": "Artist"
+    }
   ]
 }
