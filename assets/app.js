@@ -210,7 +210,15 @@
         <span class="i-date mono">${shortDate(x.date)}</span>
         <span class="i-main"><span class="i-title">${esc(x.title)}</span><span class="i-note">${esc([x.by, x.type].filter(Boolean).join(" · "))}</span></span>
       </li>`).join("")}</ul></section>` : "";
-    app.innerHTML = `${(data.shelves || data.rows.map((r) => [r.key])).map(shelfHtml).join("")}${logHtml}`;
+    const STYLES = [["watercolor", "Watercolor"], ["anthropic", "Anthropic"], ["clay", "Clay"]];
+    let chosen = "anthropic"; try { chosen = localStorage.getItem("shelf-style") || chosen; } catch (e) {}
+    app.innerHTML = `<div class="style-pick" role="group" aria-label="Shelf style">${STYLES.map(([k, l]) => `<button type="button" data-st="${k}" class="${k === chosen ? "on" : ""}">${l}</button>`).join("")}</div>
+      <div class="shelf-page" data-style="${chosen}">${(data.shelves || data.rows.map((r) => [r.key])).map(shelfHtml).join("")}</div>${logHtml}`;
+    app.querySelectorAll(".style-pick button").forEach((b) => b.addEventListener("click", () => {
+      app.querySelector(".shelf-page").dataset.style = b.dataset.st;
+      app.querySelectorAll(".style-pick button").forEach((x) => x.classList.toggle("on", x === b));
+      try { localStorage.setItem("shelf-style", b.dataset.st); } catch (e) {}
+    }));
 
     const detail = (it) => {
       if (it.kind === "recipe") return `<div class="pulled-in recipe-in"><div class="pv recipe-card" style="--c:${tint(it.color)}"><span>${esc(it.title)}</span><small>${esc(it.time || "")}</small></div><div class="pt">
