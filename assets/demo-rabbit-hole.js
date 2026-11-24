@@ -45,6 +45,10 @@
 
   function mount(el) {
     let trail = [{ ...START }], mode = "album", branch = 0, menu = false, saved = false, playing = true, toast = "";
+    let shuffle = true, repeat = false, vol = 0.7, pos = 43;
+    const liked = new Set([START.title]);
+    const secs = (t) => { const [m, x] = dur(t).split(":"); return +m * 60 + +x; };
+    const clock = (v) => `${Math.floor(v / 60)}:${String(Math.floor(v % 60)).padStart(2, "0")}`;
     const seen = new Set([START.title]);
     const ALBUM = [START, { title: "Window Seat", artist: START.artist, genre: START.genre, hue: 150 }, { title: "Agua Morna", artist: START.artist, genre: START.genre, hue: 150 }, { title: "Small Hours", artist: START.artist, genre: START.genre, hue: 150 }];
     const dur = (t) => `${2 + (t.length % 3)}:${String(10 + (t.length * 7) % 49).padStart(2, "0")}`;
@@ -87,18 +91,18 @@
            </div>
            <div class="dk-bar"><button type="button" class="dk-bigplay" aria-label="${playing ? "Pause" : "Play"}">${ic(playing ? "pause" : "play", "", !playing)}</button>
              <span class="dk-tip">Open ⋯ on the right to find the new option</span></div>
-           <div class="dk-table">${ALBUM.map((x, i) => `<div class="dk-row${i === 0 ? " on" : ""}"><span class="n">${i === 0 && playing ? '<i class="eq"><b></b><b></b><b></b></i>' : i + 1}</span>
-               <span class="t"><b>${esc(x.title)}</b><small>${esc(x.artist)}</small></span><span class="d">${dur(x.title)}</span></div>`).join("")}</div>`;
+           <div class="dk-table">${ALBUM.map((x, i) => `<button type="button" class="dk-row dk-arow${x.title === cur.title ? " on" : ""}" data-a="${i}"><span class="n">${x.title === cur.title && playing ? '<i class="eq"><b></b><b></b><b></b></i>' : i + 1}</span>
+               <span class="t"><b>${esc(x.title)}</b><small>${esc(x.artist)}</small></span><span class="d">${dur(x.title)}</span></button>`).join("")}</div>`;
 
       el.innerHTML = `<div class="dk-win">
-        <div class="dk-top"><span class="dk-lights"><i></i><i></i><i></i></span><span class="dk-search">${ic("search")}What do you want to play?</span><span class="dk-av">I</span></div>
+        <div class="dk-top"><span class="dk-lights"><i></i><i></i><i></i></span><button type="button" class="dk-search">${ic("search")}What do you want to play?</button><button type="button" class="dk-av" aria-label="Profile">I</button></div>
         <div class="dk-body">
-          <div class="dk-rail"><span class="dk-lib">${ic("library")}</span><span class="dk-tile" style="--ah:270"></span><span class="dk-tile" style="--ah:20"></span>${rh ? art(cur, "dk-tile") : ""}</div>
+          <div class="dk-rail"><button type="button" class="dk-lib dk-home" aria-label="Back to album">${ic("library")}</button><button type="button" class="dk-tile dk-home" style="--ah:150" aria-label="Late Bloom album"></button><button type="button" class="dk-tile dk-liked" style="--ah:260" aria-label="Liked Songs"></button>${rh ? art(cur, "dk-tile") : ""}</div>
           <div class="dk-main">${main}</div>
           <div class="dk-side">
             <div class="dk-side-h"><b>${rh ? "Rabbit hole" : esc(START.title)}</b><button type="button" class="dk-more" aria-label="More options">${ic("more", "", true)}</button></div>
             ${art(cur, "big")}
-            <div class="dk-np"><span><b>${esc(cur.title)}</b><small>${esc(cur.artist)}</small></span><span class="dk-ok">${ic("check")}</span></div>
+            <div class="dk-np"><span><b>${esc(cur.title)}</b><small>${esc(cur.artist)}</small></span><button type="button" class="dk-ok${liked.has(cur.title) ? "" : " off"}" aria-label="${liked.has(cur.title) ? "Remove from" : "Save to"} Liked Songs">${ic(liked.has(cur.title) ? "check" : "plus")}</button></div>
             ${rh ? `<div class="dk-card"><small>Up next</small><span>One step further from ${esc(cur.genre)}</span></div>` : ""}
             ${menu ? `<div class="dk-menu" role="menu">
               <button type="button" role="menuitem" class="dk-mi">${ic("plus")}Add to playlist</button>
@@ -113,15 +117,15 @@
           <div class="dk-now">${art(cur, "sm")}<span><b>${esc(cur.title)}</b><small>${esc(cur.artist)}</small></span></div>
           <div class="dk-ctrl">
             <div class="dk-btns">
-              <button type="button" class="dk-ib on" aria-label="Shuffle">${ic("shuffle")}</button>
+              <button type="button" class="dk-ib dk-shuf${shuffle ? " on" : ""}" aria-label="Shuffle">${ic("shuffle")}</button>
               <button type="button" class="dk-ib dk-prev" aria-label="Previous">${ic("prev", "", true)}</button>
               <button type="button" class="dk-play" aria-label="${playing ? "Pause" : "Play"}">${ic(playing ? "pause" : "play", "", !playing)}</button>
               <button type="button" class="dk-ib dk-next${rh ? " glow" : ""}" aria-label="${rh ? "One step further" : "Next"}">${ic("next", "", true)}</button>
-              <button type="button" class="dk-ib" aria-label="Repeat">${ic("repeat")}</button>
+              <button type="button" class="dk-ib dk-rep${repeat ? " on" : ""}" aria-label="Repeat">${ic("repeat")}</button>
             </div>
-            <div class="dk-prog"><span>0:43</span><span class="dk-track"><i></i></span><span>${dur(cur.title)}</span></div>
+            <div class="dk-prog"><span class="dk-pos">${clock(pos)}</span><span class="dk-track dk-seek" role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="${secs(cur.title)}" aria-valuenow="${Math.floor(pos)}"><i style="width:${pos / secs(cur.title) * 100}%"></i></span><span>${dur(cur.title)}</span></div>
           </div>
-          <div class="dk-vol">${ic("queue")}<span class="dk-track sm"><i></i></span></div>
+          <div class="dk-vol"><button type="button" class="dk-ib dk-q" aria-label="Queue">${ic("queue")}</button><span class="dk-track sm dk-volbar" role="slider" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(vol * 100)}"><i style="width:${vol * 100}%"></i></span></div>
         </div>
         ${toast ? `<div class="dk-toast">${esc(toast)}</div>` : ""}
       </div>`;
@@ -130,24 +134,64 @@
       $(".dk-more").addEventListener("click", (e) => { e.stopPropagation(); menu = !menu; render(); });
       el.querySelectorAll(".dk-mi:not(.dk-new)").forEach((b) => b.addEventListener("click", () => { menu = false; render(); }));
       const nw = $(".dk-new"); if (nw) nw.addEventListener("click", () => {
-        menu = false; mode = "rabbit"; trail = [trail[trail.length - 1]]; seen.clear(); seen.add(trail[0].title); saved = false; playing = true; flash("Rabbit hole started. Press next.");
+        menu = false; mode = "rabbit"; pos = 0; trail = [trail[trail.length - 1]]; seen.clear(); seen.add(trail[0].title); saved = false; playing = true; flash("Rabbit hole started. Press next.");
       });
       el.querySelectorAll(".dk-bigplay, .dk-play").forEach((b) => b.addEventListener("click", () => { playing = !playing; render(); }));
       $(".dk-next").addEventListener("click", () => {
-        if (mode !== "rabbit") { menu = true; render(); return; }
+        pos = 0;
+        if (mode !== "rabbit") { const i = ALBUM.findIndex((x) => x.title === cur.title); trail = [{ ...ALBUM[(i + 1) % ALBUM.length] }]; playing = true; render(); return; }
         trail.push(nextSong()); saved = false; playing = true; render();
       });
-      $(".dk-prev").addEventListener("click", () => { if (mode === "rabbit" && trail.length > 1) { trail.pop(); render(); } });
+      $(".dk-prev").addEventListener("click", () => {
+        if (pos > 3 || mode !== "rabbit" || trail.length < 2) { pos = 0; tickDom(); return; }
+        trail.pop(); pos = 0; render();
+      });
       const sv = $(".dk-savebtn"); if (sv) sv.addEventListener("click", () => {
         if (trail.length < 2) return flash("Take a few steps first");
         saved = true; flash(`Saved "Rabbit hole from ${trail[0].title}" to Your Library`);
       });
-      el.querySelectorAll(".dk-dot, button.dk-row").forEach((d) => d.addEventListener("click", () => {
+      el.querySelectorAll(".dk-dot, button.dk-row[data-i]").forEach((d) => d.addEventListener("click", () => {
         const i = +d.dataset.i; if (i === trail.length - 1) return;
         trail = trail.slice(0, i + 1); branch++; saved = false; flash("Branched. The next step takes a new path.");
       }));
       const t = $(".dk-trail"); if (t) t.scrollLeft = t.scrollWidth;
+      el.querySelectorAll(".dk-arow").forEach((r) => r.addEventListener("click", () => { trail = [{ ...ALBUM[+r.dataset.a] }]; pos = 0; playing = true; render(); }));
+      el.querySelectorAll(".dk-home").forEach((b) => b.addEventListener("click", () => { mode = "album"; trail = [{ ...START }]; pos = 0; menu = false; render(); }));
+      $(".dk-liked").addEventListener("click", () => flash(`${liked.size} liked song${liked.size === 1 ? "" : "s"} in this demo`));
+      $(".dk-search").addEventListener("click", () => flash("Search isn't part of this concept. Try ⋯ on the right."));
+      $(".dk-av").addEventListener("click", () => flash("Signed in as Isaac"));
+      $(".dk-ok").addEventListener("click", () => { const k = cur.title; liked.has(k) ? liked.delete(k) : liked.add(k); flash(liked.has(k) ? "Added to Liked Songs" : "Removed from Liked Songs"); });
+      $(".dk-shuf").addEventListener("click", () => { shuffle = !shuffle; render(); });
+      $(".dk-rep").addEventListener("click", () => { repeat = !repeat; flash(repeat ? "Repeating this song" : "Repeat off"); });
+      $(".dk-q").addEventListener("click", () => flash(mode === "rabbit" ? "Up next: one step further" : "Up next: the rest of the album"));
+      const setFrom = (bar, e) => { const r = bar.getBoundingClientRect(); return Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)); };
+      $(".dk-seek").addEventListener("click", (e) => { pos = setFrom(e.currentTarget, e) * secs(cur.title); tickDom(); });
+      $(".dk-volbar").addEventListener("click", (e) => { vol = setFrom(e.currentTarget, e); e.currentTarget.firstChild.style.width = vol * 100 + "%"; });
+      el.querySelectorAll(".dk-mi:not(.dk-new)").forEach((b) => b.addEventListener("click", () => {
+        const msg = { "Add to playlist": "Added to Rabbit hole drafts", "Add to queue": "Added to queue", "Go to song radio": "Song radio stays close to this song. Try the rabbit hole instead.", "Share": "Link copied" }[b.textContent.trim()];
+        if (msg) flash(msg);
+      }));
     }
+    function tickDom() {
+      const cur = trail[trail.length - 1], L = secs(cur.title), b = el.querySelector(".dk-seek i"), p = el.querySelector(".dk-pos");
+      if (b) b.style.width = Math.min(100, pos / L * 100) + "%"; if (p) p.textContent = clock(pos);
+    }
+    let last = performance.now();
+    (function loop(now) {
+      const dt = (now - last) / 1000; last = now;
+      if (!el.isConnected) return;
+      if (playing) {
+        pos += dt;
+        const cur = trail[trail.length - 1];
+        if (pos >= secs(cur.title)) {
+          pos = 0;
+          if (repeat) {} else if (mode === "rabbit") { trail.push(nextSong()); saved = false; render(); }
+          else { const i = ALBUM.findIndex((x) => x.title === cur.title); trail = [{ ...ALBUM[(i + 1) % ALBUM.length] }]; render(); }
+        }
+        tickDom();
+      }
+      requestAnimationFrame(loop);
+    })(last);
     el.addEventListener("click", (e) => { if (menu && !e.target.closest(".dk-menu, .dk-more")) { menu = false; render(); } });
     let tt;
     function flash(msg) { toast = msg; render(); clearTimeout(tt); tt = setTimeout(() => { toast = ""; render(); }, 2000); }

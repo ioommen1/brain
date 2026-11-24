@@ -880,3 +880,10 @@ div.dk-row { grid-template-columns: 26px minmax(0, 1fr) 40px; }
   .dk-tip::after { content: " (tap Next)"; }
 }
 @media (prefers-reduced-motion: reduce) { .eq b, .dk-next.glow::after { animation: none; } }
+.dk-search { cursor: pointer; transition: background-color .3s; } .dk-search:hover { background: #2a2a2a; }
+.dk-av, .dk-tile, .dk-lib { cursor: pointer; transition: transform .2s, color .3s; } .dk-tile:hover { transform: scale(1.06); } .dk-lib:hover { color: #fff; }
+.dk-ok { color: var(--g); transition: color .3s; } .dk-ok.off { color: var(--t2); } .dk-ok.off:hover { color: #fff; }
+.dk-seek, .dk-volbar { cursor: pointer; padding: 4px 0; background-clip: content-box; height: 12px; box-sizing: border-box; }
+.dk-seek:hover i, .dk-volbar:hover i { background: var(--g); }
+.dk-seek i { transition: none; }
+.dk-ib.on::before { content: ""; position: absolute; left: 50%; bottom: -6px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--g); }
