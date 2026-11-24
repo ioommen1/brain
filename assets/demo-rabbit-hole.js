@@ -35,7 +35,7 @@
     pause: '<rect x="6.5" y="5" width="4" height="14" rx="1.2"/><rect x="13.5" y="5" width="4" height="14" rx="1.2"/>',
     repeat: '<path d="M5 10V8a2 2 0 0 1 2-2h11l-2-2M19 14v2a2 2 0 0 1-2 2H6l2 2"/>',
     radio: '<circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"/>',
-    hole: '<path d="M12.6 11.4a1 1 0 1 1-1.4 1.3 2.2 2.2 0 0 1 2.9-2.9 3.6 3.6 0 0 1-1.1 6.6 5 5 0 0 1-5.6-5.7 6.4 6.4 0 0 1 9.6-4.4 7.8 7.8 0 0 1 2.4 9.9"/>',
+    hole: '<path d="M14.5 13a2.5 2.5 0 0 0-5 0a5 5 0 0 0 10 0a7.5 7.5 0 0 0-15 0"/>',
     queue: '<path d="M4 7h11M4 12h11M4 17h7M18 14v6M15 17h6"/>',
     share: '<path d="M12 4v11M8 8l4-4 4 4M5 13v6h14v-6"/>',
     search: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>',
@@ -85,8 +85,7 @@
              <button type="button" class="dk-bigplay" aria-label="${playing ? "Pause" : "Play"}">${ic(playing ? "pause" : "play", "", true)}</button>
              <button type="button" class="dk-savebtn${saved ? " on" : ""}">${ic(saved ? "check" : "plus")}${saved ? "Saved" : "Save as playlist"}</button>
            </div>
-           <div class="dk-trail" role="list" aria-label="Trail">${trail.map((x, i) => `<button type="button" role="listitem" class="dk-dot${i === trail.length - 1 ? " on" : ""}" data-i="${i}" style="--dh:${x.hue}" title="Branch from ${esc(x.title)}" aria-label="Branch from ${esc(x.title)}"></button>`).join('<i class="dk-link"></i>')}</div>
-           <div class="dk-table">${trail.map((x, i) => `<button type="button" class="dk-row${i === trail.length - 1 ? " on" : ""}" data-i="${i}">
+           <div class="dk-table">${trail.map((x, i) => `<button type="button" class="dk-row${i === trail.length - 1 ? " on" : ""}" data-i="${i}" title="${i === trail.length - 1 ? "Now playing" : "Branch from here"}">
                <span class="n">${i === trail.length - 1 && playing ? '<i class="eq"><b></b><b></b><b></b></i>' : i + 1}</span>${art(x, "sm")}
                <span class="t"><b>${esc(x.title)}</b><small>${esc(x.artist)}</small></span><span class="g">${esc(x.genre)}</span><span class="d">${dur(x.title)}</span></button>`).join("")}</div>`
         : `<div class="dk-hero" style="--hh:${START.hue}">
@@ -170,11 +169,10 @@
         if (trail.length < 2) return flash("Take a few steps first");
         saved = true; flash(`Saved "Rabbit hole from ${trail[0].title}" to Your Library`);
       });
-      el.querySelectorAll(".dk-dot, button.dk-row[data-i]").forEach((d) => d.addEventListener("click", () => {
+      el.querySelectorAll("button.dk-row[data-i]").forEach((d) => d.addEventListener("click", () => {
         const i = +d.dataset.i; if (i === trail.length - 1) return;
         trail = trail.slice(0, i + 1); branch++; saved = false; flash("Branched. The next step takes a new path.");
       }));
-      const t = $(".dk-trail"); if (t) t.scrollLeft = t.scrollWidth;
       el.querySelectorAll(".dk-arow").forEach((r) => r.addEventListener("click", () => { trail = [{ ...ALBUM[+r.dataset.a] }]; pos = 0; playing = true; render(); }));
       el.querySelectorAll(".dk-home").forEach((b) => b.addEventListener("click", () => { mode = "album"; trail = [{ ...START }]; pos = 0; menu = false; render(); }));
       $(".dk-liked").addEventListener("click", () => flash(`${liked.size} liked song${liked.size === 1 ? "" : "s"} in this demo`));

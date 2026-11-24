@@ -930,3 +930,8 @@ div.dk-row { grid-template-columns: 26px minmax(0, 1fr) 40px; }
 .dk-vol .ic { width: 20px; height: 20px; }
 .dk-play { width: 34px; height: 34px; } .dk-play .ic { width: 18px; height: 18px; }
 .dk-bigplay .ic { width: 22px; height: 22px; }
+.dk-btns .dk-rhbtn .ic { width: 22px; height: 22px; stroke-width: 1.9; shape-rendering: geometricPrecision; }
+.dk-btns .dk-rhbtn .ic { stroke-width: 2; }
+/* Branch hint replaces the dot trail */
+.dk-row[data-i]:not(.on):hover .g { color: transparent; position: relative; }
+.dk-row[data-i]:not(.on):hover .g::after { content: "Branch from here"; position: absolute; left: 0; color: var(--g); font-weight: 600; }

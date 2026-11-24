@@ -64,9 +64,9 @@ A different artist with the same sound, then that sound from another decade, the
 
 #### The trail
 
-### A dot for every song, so I can see how far I've gone.
+### Every song I pass through stays on the list, so I can see how far I've gone.
 
-The trail builds across the top of the player. If I land on something I love, I tap that dot and branch off from there.
+The page shows where I started and where I am now. If I land on something I love, I tap that song and branch off from there.
 
 #### Saving it
 
