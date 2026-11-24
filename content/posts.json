@@ -15,10 +15,16 @@
       "app": "Spotify",
       "title": "Rabbit Hole",
       "date": "2026-11-24",
-      "readTime": "3 min read",
+      "readTime": "4 min read",
       "palette": 1,
       "mark": "One step further.",
-      "summary": "Radio keeps me close to what I know. Rabbit hole takes me one step further with every song."
+      "summary": "Radio keeps me close to what I know. Rabbit hole takes me one step further with every song.",
+      "week": 1,
+      "scope": [
+        "Problem framing",
+        "Exploration",
+        "Interaction design"
+      ]
     },
     {
       "section": "thoughts",

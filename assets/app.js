@@ -123,7 +123,12 @@
     <div class="article-layout">
     <aside class="toc" aria-label="On this page"></aside>
     <article class="article" id="top">
-      <div class="spec mono"><span><b>Entry</b>${code(p)}</span><span><b>Filed</b>${shortDate(p.date)}</span>${typeLabel(p) ? `<span><b>Type</b>${esc(typeLabel(p))}</span>` : ""}${(p.status || p.ticker) ? `<span><b>${p.ticker ? "Ticker" : "Status"}</b>${esc(p.status || p.ticker)}</span>` : ""}${p.readTime ? `<span><b>Read</b>${esc(p.readTime)}</span>` : ""}</div>
+      <div class="facts">${[
+        p.week ? ["Week", String(p.week).padStart(2, "0") + " · " + new Date(p.date + "T00:00:00").toLocaleDateString("en-US", { month: "short", year: "numeric" })] : ["Date", fmtDate(p.date)],
+        typeLabel(p) ? ["Type", typeLabel(p)] : p.ticker ? ["Ticker", p.ticker] : null,
+        p.scope ? ["Scope", p.scope] : p.status ? ["Status", p.status] : null,
+        p.collaborators ? ["Collaborators", p.collaborators] : null,
+      ].filter(Boolean).map(([k, v]) => `<div><span>${k}</span>${(Array.isArray(v) ? v : [v]).map((x) => `<strong>${esc(x)}</strong>`).join("")}</div>`).join("")}</div>
       <h1>${esc(p.title)}</h1>
       <p class="lede">${esc(p.summary)}</p>
       ${hero}${memo}
@@ -139,18 +144,19 @@
   function buildToc() {
     const toc = app.querySelector(".toc"); const heads = [...app.querySelectorAll(".prose h2")];
     if (!toc || heads.length < 2) { toc && toc.remove(); app.querySelector(".article-layout")?.classList.add("no-toc"); return; }
-    const targets = [app.querySelector("#top"), ...heads];
-    toc.innerHTML = targets.map((h, i) => `<button type="button" data-t="${i}">${i ? esc(h.textContent) : "Overview"}</button>`).join("");
+    const own = heads[0].textContent.trim().toLowerCase() === "overview";
+    const targets = own ? heads : [app.querySelector("#top"), ...heads];
+    toc.innerHTML = targets.map((h, i) => `<button type="button" data-t="${i}">${!own && !i ? "Overview" : esc(h.textContent)}</button>`).join("");
     const btns = [...toc.querySelectorAll("button")];
     const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
     btns.forEach((b) => b.addEventListener("click", () => {
-      const t = targets[+b.dataset.t]; const y = t.getBoundingClientRect().top + scrollY - (+b.dataset.t ? 24 : 120);
+      const t = targets[+b.dataset.t]; const y = t.getBoundingClientRect().top + scrollY - (!own && !+b.dataset.t ? 120 : 24);
       scrollTo({ top: Math.max(0, y), behavior: still ? "auto" : "smooth" });
     }));
     const spy = () => {
       if (!toc.isConnected) return removeEventListener("scroll", spy);
       const line = Math.min(innerHeight * 0.3, 160); let cur = 0;
-      heads.forEach((h, i) => { if (h.getBoundingClientRect().top < line) cur = i + 1; });
+      heads.forEach((h, i) => { if (h.getBoundingClientRect().top < line) cur = own ? i : i + 1; });
       if (innerHeight + scrollY >= document.documentElement.scrollHeight - 4) cur = targets.length - 1;
       btns.forEach((b, i) => b.classList.toggle("on", i === cur));
     };

@@ -125,9 +125,8 @@ main { min-height: 60vh; padding: 32px 0 64px; }
 .article .hero .cover { aspect-ratio: 16 / 9; position: relative; overflow: hidden; border: 1px solid var(--faint); background: var(--card); }
 .article .hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .prose { font-size: 17px; line-height: 1.75; }
-.prose { counter-reset: chapter; }
-.prose h2::before { counter-increment: chapter; content: counter(chapter, decimal-leading-zero); color: var(--muted); margin-right: 12px; }
-.prose h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--accent-text); margin: 40px 0 8px; }
+.prose h2 { font-size: 26px; font-weight: 500; letter-spacing: -0.02em; color: var(--fg); margin: 72px 0 18px; text-transform: none; }
+.prose h2:first-child { margin-top: 8px; }
 .prose h3 { font-size: 17px; font-weight: 600; margin: 28px 0 4px; }
 .prose a { border-bottom: 1px solid var(--accent); }
 .prose blockquote { margin: 36px 0; padding: 0 0 0 20px; border-left: 3px solid var(--accent); color: var(--fg); font-size: 24px; line-height: 1.35; letter-spacing: -0.01em; font-weight: 500; }
@@ -399,3 +398,12 @@ main > * { animation: fade .35s ease both; }
 .i-note { display: block; color: var(--muted); font-size: 14.5px; margin-top: 2px; }
 .i-link { font-size: 14px; color: var(--accent-text); white-space: nowrap; }
 @media (max-width: 640px) { .ideas li { grid-template-columns: minmax(0, 1fr); gap: 2px; } .ideas li::before { display: none; } .i-link { white-space: normal; } }
+
+/* Case-study facts header: label above value */
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px 32px; margin: 32px 0 28px; padding: 20px 0; border-top: 1px solid var(--fg); border-bottom: 1px solid var(--faint); }
+.facts span { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.facts strong { display: block; font-weight: 400; font-size: 15px; line-height: 1.45; }
+/* Exploration subheads read as a sequence */
+.prose h3 { font-size: 20px; font-weight: 500; letter-spacing: -0.015em; line-height: 1.35; color: var(--fg); margin: 30px 0 8px; text-wrap: balance; }
+.prose h4 { font-size: 13px; font-weight: 500; color: var(--accent-text); margin: 44px 0 -22px; letter-spacing: .01em; }
+.prose h4 + h3 { margin-top: 26px; }
