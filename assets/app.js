@@ -44,12 +44,12 @@
   const LETTER = { concepts: "C", thoughts: "T", memos: "M" };
   const KIND = { concepts: "Concept", thoughts: "Thought", memos: "Memo" };
   const code = (p) => `${LETTER[p.section]}–${p.no}`;
-  const shortDate = (d) => new Date(d + "T00:00:00").toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }).toUpperCase();
+  const shortDate = (d) => new Date(d + "T00:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   const row = (p) => `<a class="row" href="#/${p.section}/${p.slug}" data-slug="${p.section}/${p.slug}">
       <span class="r-no mono">${code(p)}</span>
       <span class="r-thumb">${cover(p)}</span>
-      <span class="r-main"><span class="r-title">${esc(p.title)}</span><span class="r-sum">${esc(p.subtitle || p.summary)}</span></span>
+      <span class="r-main"><span class="r-title">${esc(p.title)}</span><span class="r-sum">${esc(p.summary)}</span></span>
       <span class="r-kind mono">${esc(p.ticker || p.status || KIND[p.section])}</span>
       <span class="r-date mono">${shortDate(p.date)}</span>
     </a>`;
@@ -76,13 +76,8 @@
       : [["", "All"], ...Object.keys(SECTIONS).map((k) => [k, SECTIONS[k].title])];
     const count = (g) => !g ? items.length : items.filter((p) => key ? (p.tags || []).includes(g) : p.section === g).length;
     const head = key
-      ? `<section class="page-top"><div class="eyebrow mono">${esc(SECTIONS[key].title)} · ${String(items.length).padStart(2, "0")} entries</div><h1>${esc(SECTIONS[key].blurb || SECTIONS[key].title)}</h1></section>`
-      : `<section class="hero">
-          <div class="eyebrow mono">${esc(site.eyebrow || "")}</div>
-          <h1>${site.headline}</h1>
-          ${site.intro.map((p) => `<p class="lead">${p}</p>`).join("")}
-          ${seasonStrip()}
-        </section>`;
+      ? `<section class="page-top${key === "concepts" ? " with-season" : ""}"><h1>${esc(SECTIONS[key].blurb || SECTIONS[key].title)}</h1>${key === "concepts" ? seasonStrip() : ""}</section>`
+      : `<section class="hero"><h1>${site.headline}</h1></section>`;
     app.innerHTML = `${head}
       <section class="index">
         <div class="filters mono">${groups.map(([g, label], i) => `<button class="${i ? "" : "on"}" data-g="${esc(g)}">${esc(label)}<sup>${String(count(g)).padStart(2, "0")}</sup></button>`).join("")}</div>
@@ -157,52 +152,65 @@
     addEventListener("scroll", spy, { passive: true }); spy();
   }
 
-  // ---------- Shelf ----------
+  // ---------- Shelf: a real bookshelf ----------
   async function shelf() {
     const data = await fetch("content/shelf.json").then((r) => r.json()).catch(() => null);
     if (!data) return notFound();
-    const cover = (it, cls) => it.cover
-      ? `<img class="${cls}" src="${esc(it.cover)}" alt="${esc(it.title)}" loading="lazy">`
-      : `<div class="${cls} gen" style="--c:${esc(it.color || "#8d8c88")};--ink:${esc(it.ink || "#fff")}"><span class="gt">${esc(it.title)}</span><span class="gb">${esc(it.by)}</span></div>`;
-    const item = {
-      cd: (it, i) => `<button class="cd" data-i="${i}" aria-label="${esc(it.title)} by ${esc(it.by)}">
-          <span class="disc"></span><span class="case">${cover(it, "art")}<span class="hinge"></span><span class="gloss"></span></span></button>`,
-      book: (it, i) => {
-        const h = 78 + ((it.title.length * 7) % 22); const w = 34 + Math.min(it.title.length, 28);
-        return `<button class="book" data-i="${i}" style="--c:${esc(it.color || "#8d8c88")};--ink:${esc(it.ink || "#fff")};height:${h}%;width:${w}px" aria-label="${esc(it.title)} by ${esc(it.by)}">
-          <span class="spine-t">${esc(it.title)}</span><span class="spine-b">${esc(it.by.split(" ").pop())}</span></button>`;
-      },
-      paper: (it) => {
-        const shot = it.cover
-          ? `<img src="${esc(it.cover)}" alt="First page of ${esc(it.title)}" loading="lazy">`
-          : `<div class="page"><div class="pt">${esc(it.title)}</div><div class="pa">${esc(it.by)}</div><div class="ab">ABSTRACT</div>${[92, 100, 96, 100, 88, 97, 70].map((w) => `<div class="ln" style="width:${w}%"></div>`).join("")}</div>`;
-        const link = it.link ? `href="${esc(it.link)}" target="_blank" rel="noopener"` : "";
-        return `<article class="paper">
-          <a class="shot" ${link}>${shot}</a>
-          <div class="meta">${esc(it.by)}${it.venue ? ` · ${esc(it.venue)}` : ""}${it.year ? ` · ${it.year}` : ""}</div>
-          <h3>${esc(it.title)}</h3>
-          <p class="thoughts">${it.note ? esc(it.note) : "<em>My thoughts on this paper go here.</em>"}</p>
-          ${it.link ? `<a class="read" ${link}>Read the paper ↗</a>` : ""}
-        </article>`;
-      },
-      film: (it, i) => `<button class="film" data-i="${i}" aria-label="${esc(it.title)} by ${esc(it.by)}">${cover(it, "poster")}</button>`,
+    const rows = Object.fromEntries(data.rows.map((r) => [r.key, r]));
+    const all = []; // flat list so every spine has an index
+    const tint = (c) => c || "#8d8c88";
+    const styleOf = (it) => ["band", "block", "plain", "rule"][hash(it.title) % 4];
+
+    const spine = (it, kind, last) => {
+      const i = all.push({ ...it, kind }) - 1;
+      const h = hash(it.title);
+      if (kind === "paper") {
+        const w = 150 + (h % 50);
+        return `<button class="sp paper" data-i="${i}" style="width:${w}px" aria-label="${esc(it.title)}"><span>${esc(it.title)}</span></button>`;
+      }
+      if (kind === "cd") return `<button class="sp cd" data-i="${i}" style="--c:${tint(it.color)}" aria-label="${esc(it.title)} by ${esc(it.by)}"><span class="t">${esc(it.title)}</span></button>`;
+      if (kind === "film") return `<button class="sp film" data-i="${i}" style="--c:${tint(it.color)}" aria-label="${esc(it.title)}"><span class="t">${esc(it.title)}</span><i class="dot"></i></button>`;
+      const w = Math.round(24 + Math.min(it.pages || 300, 640) / 640 * 26);
+      const ht = 74 + (h % 20);
+      return `<button class="sp book s-${styleOf(it)}${last ? " lean" : ""}" data-i="${i}" style="--c:${tint(it.color)};--ink:${it.ink || "#fff"};width:${w}px;height:${ht}%" aria-label="${esc(it.title)} by ${esc(it.by)}">
+        <span class="t">${esc(it.title)}</span><i class="dot"></i></button>`;
     };
-    app.innerHTML = `<section class="intro shelf-intro"><h1>Shelf</h1><p>${esc(data.intro)}</p></section>
-      ${data.rows.map((r) => `<section class="shelf-row" data-row="${esc(r.key)}">
-        <div class="row-head"><span>${esc(r.title)}</span><span class="count">${r.items.length}</span></div>
-        <div class="rack rack-${r.kind}">${r.items.map(item[r.kind]).join("")}</div>
-        <div class="detail" aria-live="polite"></div>
-      </section>`).join("")}`;
-    app.querySelectorAll(".shelf-row").forEach((rowEl, ri) => {
-      const row = data.rows[ri]; const detail = rowEl.querySelector(".detail");
-      rowEl.querySelectorAll("[data-i]").forEach((b) => b.addEventListener("click", () => {
-        const on = b.classList.contains("on");
-        rowEl.querySelectorAll("[data-i]").forEach((x) => x.classList.remove("on"));
-        if (on) { detail.innerHTML = ""; return; }
-        b.classList.add("on");
-        const it = row.items[+b.dataset.i];
-        detail.innerHTML = `<div class="detail-in"><strong>${esc(it.title)}</strong><span>${esc(it.by)}${it.year ? ` · ${it.year}` : ""}</span>
-          <p>${it.note ? esc(it.note) : `<em>A line on why this one stuck goes here.</em>`}</p></div>`;
+
+    const shelfHtml = (keys, si) => {
+      const books = keys.filter((k) => rows[k] && rows[k].kind === "book").flatMap((k) => rows[k].items);
+      const stand = keys.filter((k) => rows[k] && ["cd", "film"].includes(rows[k].kind));
+      const flat = keys.filter((k) => rows[k] && rows[k].kind === "paper").flatMap((k) => rows[k].items);
+      let html = books.map((it) => spine(it, "book")).join("");
+      stand.forEach((k, n) => { if (n || books.length) html += `<span class="gap"></span>`; html += rows[k].items.map((it) => spine(it, rows[k].kind)).join(""); });
+      if (flat.length) html += `<span class="gap"></span><span class="stack">${flat.map((it) => spine(it, "paper")).join("")}</span>`;
+      return `<section class="shelf-unit" data-s="${si}">
+        <div class="ledge"><div class="row-of">${html}</div></div>
+        <div class="plank"></div>
+        <div class="pulled" aria-live="polite"></div>
+      </section>`;
+    };
+
+    app.innerHTML = `${(data.shelves || data.rows.map((r) => [r.key])).map(shelfHtml).join("")}`;
+
+    const detail = (it) => {
+      const vis = it.kind === "paper"
+        ? `<div class="pv paper-shot">${it.cover ? `<img src="${esc(it.cover)}" alt="">` : `<b>${esc(it.title)}</b><small>${esc(it.by)}</small>${[92, 100, 96, 100, 84, 97].map((w) => `<i style="width:${w}%"></i>`).join("")}`}</div>`
+        : `<div class="pv cover-${it.kind}" style="--c:${tint(it.color)};--ink:${it.ink || "#fff"}">${it.cover ? `<img src="${esc(it.cover)}" alt="">` : `<span>${esc(it.title)}</span><small>${esc(it.by)}</small>`}</div>`;
+      const kindName = { book: "Book", cd: "Album", film: "Film", paper: "Paper" }[it.kind];
+      return `<div class="pulled-in">${vis}<div class="pt">
+        <div class="eyebrow mono">${kindName}${it.year ? ` · ${it.year}` : ""}${it.venue ? ` · ${esc(it.venue)}` : ""}</div>
+        <h3>${esc(it.title)}</h3><div class="by">${esc(it.by)}</div>
+        <p>${it.note ? esc(it.note) : `<span class="muted">Why it stayed on the shelf goes here.</span>`}</p>
+        ${it.link ? `<a class="read" href="${esc(it.link)}" target="_blank" rel="noopener">Read the paper ↗</a>` : ""}
+      </div><button class="close" aria-label="Put it back">Put back</button></div>`;
+    };
+    app.querySelectorAll(".shelf-unit").forEach((unit) => {
+      const out = unit.querySelector(".pulled");
+      const reset = () => { unit.querySelectorAll(".sp.on").forEach((x) => x.classList.remove("on")); out.innerHTML = ""; };
+      unit.querySelectorAll(".sp").forEach((b) => b.addEventListener("click", () => {
+        const was = b.classList.contains("on"); reset(); if (was) return;
+        b.classList.add("on"); out.innerHTML = detail(all[+b.dataset.i]);
+        out.querySelector(".close").addEventListener("click", reset);
       }));
     });
   }

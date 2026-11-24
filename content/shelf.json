@@ -1,5 +1,4 @@
 {
-  "intro": "Things that stuck with me, and a line on why. Sample picks below; swap in your own.",
   "rows": [
     {
       "key": "listening",
@@ -10,29 +9,25 @@
           "title": "Blonde",
           "by": "Frank Ocean",
           "year": 2016,
-          "color": "#c9a46a",
-          "note": ""
+          "color": "#c9a46a"
         },
         {
           "title": "In Rainbows",
           "by": "Radiohead",
           "year": 2007,
-          "color": "#d9622b",
-          "note": ""
+          "color": "#d9622b"
         },
         {
           "title": "Kind of Blue",
           "by": "Miles Davis",
           "year": 1959,
-          "color": "#2f4a6b",
-          "note": ""
+          "color": "#2f4a6b"
         },
         {
           "title": "Random Access Memories",
           "by": "Daft Punk",
           "year": 2013,
-          "color": "#3a3a38",
-          "note": ""
+          "color": "#3a3a38"
         }
       ]
     },
@@ -47,42 +42,42 @@
           "year": 2023,
           "color": "#e8e1d3",
           "ink": "#3a3a38",
-          "note": ""
+          "pages": 496
         },
         {
           "title": "Creative Selection",
           "by": "Ken Kocienda",
           "year": 2018,
           "color": "#3f5e57",
-          "note": ""
+          "pages": 272
         },
         {
           "title": "The Design of Everyday Things",
           "by": "Don Norman",
           "year": 1988,
           "color": "#d9622b",
-          "note": ""
+          "pages": 368
         },
         {
           "title": "Barbarians at the Gate",
           "by": "Burrough & Helyar",
           "year": 1989,
           "color": "#2f2f2d",
-          "note": ""
+          "pages": 592
         },
         {
           "title": "The Mom Test",
           "by": "Rob Fitzpatrick",
           "year": 2013,
           "color": "#c9a46a",
-          "note": ""
+          "pages": 136
         },
         {
           "title": "Shoe Dog",
           "by": "Phil Knight",
           "year": 2016,
           "color": "#8a5a76",
-          "note": ""
+          "pages": 400
         }
       ]
     },
@@ -96,16 +91,14 @@
           "by": "López-Otín et al.",
           "venue": "Cell",
           "year": 2013,
-          "link": "https://doi.org/10.1016/j.cell.2013.05.039",
-          "note": ""
+          "link": "https://doi.org/10.1016/j.cell.2013.05.039"
         },
         {
           "title": "Attention Is All You Need",
           "by": "Vaswani et al.",
           "venue": "NeurIPS",
           "year": 2017,
-          "link": "https://arxiv.org/abs/1706.03762",
-          "note": ""
+          "link": "https://arxiv.org/abs/1706.03762"
         }
       ]
     },
@@ -118,31 +111,35 @@
           "title": "The Social Network",
           "by": "David Fincher",
           "year": 2010,
-          "color": "#2f3b4a",
-          "note": ""
+          "color": "#2f3b4a"
         },
         {
           "title": "Margin Call",
           "by": "J. C. Chandor",
           "year": 2011,
-          "color": "#3a3a38",
-          "note": ""
+          "color": "#3a3a38"
         },
         {
           "title": "Arrival",
           "by": "Denis Villeneuve",
           "year": 2016,
-          "color": "#6f7d82",
-          "note": ""
+          "color": "#6f7d82"
         },
         {
           "title": "Past Lives",
           "by": "Celine Song",
           "year": 2023,
-          "color": "#b07a5a",
-          "note": ""
+          "color": "#b07a5a"
         }
       ]
     }
+  ],
+  "shelves": [
+    [
+      "reading",
+      "listening",
+      "watching",
+      "papers"
+    ]
   ]
 }

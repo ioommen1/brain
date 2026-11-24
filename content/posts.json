@@ -1,11 +1,8 @@
 {
   "site": {
     "headline": "I'm Isaac. I notice small problems, design my way through them, and tell the story of what I find.",
-    "intro": [
-      "Product concepts, short thoughts, and investment memos. Fewer pieces, made carefully. If one sparks something, <a href=\"#/about\">say hello</a>."
-    ],
-    "now": "Now: planning Season 01. Twelve weeks, twelve longevity concepts.",
-    "eyebrow": "Isaac Oommen · Product, markets, longevity",
+    "intro": [],
+    "now": "Season 01 starts soon.",
     "season": {
       "label": "Season 01",
       "theme": "Longevity",
