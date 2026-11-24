@@ -57,7 +57,10 @@
     function nextSong() {
       const cur = trail[trail.length - 1], used = new Set(trail.map((x) => x.genre));
       const opts = (GRAPH[cur.genre] || []).filter((g) => !used.has(g));
-      const pool = opts.length ? opts : ALL.filter((g) => !used.has(g));
+      const recent = new Set(trail.slice(-8).map((x) => x.genre));
+      let pool = opts.length ? opts : ALL.filter((g) => !used.has(g));
+      if (!pool.length) pool = (GRAPH[cur.genre] || []).filter((g) => !recent.has(g));
+      if (!pool.length) pool = ALL.filter((g) => !recent.has(g));
       const genre = pool[(trail.length + branch) % pool.length];
       let title, artist, k = 0;
       do {
