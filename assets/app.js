@@ -33,7 +33,7 @@
     if (p.cover) return `<img src="${esc(p.cover)}" alt="" loading="lazy">`;
     const h = hash(p.slug);
     const [a, b] = PALETTE[p.palette ?? h % PALETTE.length];
-    const kicker = p.ticker || p.status || SECTIONS[p.section].title;
+    const kicker = `No. ${p.no}` + ((p.ticker || p.status) ? ` · ${p.ticker || p.status}` : "");
     return `<div class="art" style="background:linear-gradient(160deg, ${a} 0%, ${b} 140%)">
       <span class="orb" style="width:60%;aspect-ratio:1;background:${b};right:-${10 + (h % 20)}%;top:${15 + (h % 30)}%"></span>
       <span class="kicker" style="position:relative">${esc(kicker)}</span>
@@ -43,12 +43,12 @@
 
   const card = (p) => `<a class="card" href="#/${p.section}/${p.slug}">
       <div class="cover">${cover(p)}</div>
-      <div class="title">${esc(p.title)}</div>
+      <div class="title"><span class="no">${p.no}</span>${esc(p.title)}</div>
       <div class="sub">${esc(p.subtitle || p.summary)}</div>
     </a>`;
 
   const note = (p) => `<li><a href="#/${p.section}/${p.slug}">
-      <span><span class="t">${esc(p.title)}</span><span class="s">${esc(p.summary)}</span></span>
+      <span><span class="t"><span class="no">${p.no}</span>${esc(p.title)}</span><span class="s">${esc(p.summary)}</span></span>
       <span class="d">${fmtDate(p.date)}</span></a></li>`;
 
   function section(key, withIntro) {
@@ -59,7 +59,7 @@
       ? `<div class="gallery">${list.map(card).join("")}</div>`
       : `<ul class="notes">${list.map(note).join("")}</ul>`;
     app.innerHTML = `
-      ${withIntro ? `<section class="intro"><h1>${site.headline}</h1>${site.intro.map((p) => `<p>${p}</p>`).join("")}</section>` : ""}
+      ${withIntro ? `<section class="intro"><h1>${site.headline}</h1>${site.intro.map((p) => `<p>${p}</p>`).join("")}${site.now ? `<p class="now"><span class="dot"></span>${site.now}</p>` : ""}</section>` : ""}
       ${tags.length ? `<div class="filters"><button class="on" data-tag="">All</button>${tags.map((t) => `<button data-tag="${esc(t)}">${esc(t)}</button>`).join("")}</div>` : ""}
       <div id="list">${render(items)}</div>`;
     app.querySelectorAll(".filters button").forEach((b) => b.addEventListener("click", () => {
@@ -76,14 +76,17 @@
     const memo = p.memo
       ? `<div class="memo-box">${Object.entries(p.memo).map(([k, v]) => `<div><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join("")}</div>`
       : "";
+    const list = posts.filter((x) => x.section === key);
+    const next = list[(list.indexOf(p) + 1) % list.length];
     const hero = SECTIONS[key].layout === "gallery" ? `<div class="hero"><div class="cover">${cover(p)}</div></div>` : "";
     app.innerHTML = `<article class="article">
       <a class="back" href="#/${key}">← ${SECTIONS[key].title}</a>
-      <div class="article-meta">${fmtDate(p.date)}${p.readTime ? ` · ${esc(p.readTime)}` : ""}${(p.tags || []).length ? ` · ${p.tags.map(esc).join(", ")}` : ""}</div>
+      <div class="article-meta">No. ${p.no} · ${fmtDate(p.date)}${p.readTime ? ` · ${esc(p.readTime)}` : ""}${(p.tags || []).length ? ` · ${p.tags.map(esc).join(", ")}` : ""}</div>
       <h1>${esc(p.title)}</h1>
       <p class="lede">${esc(p.summary)}</p>
       ${hero}${memo}
       <div class="prose">${marked.parse(md)}</div>
+      ${next && next !== p ? `<a class="next" href="#/${key}/${next.slug}"><span>Next story</span><strong>${esc(next.title)} →</strong></a>` : ""}
       ${key === "memos" ? `<p class="disclaimer">These are personal views for discussion only and are not investment advice. I may hold positions in securities mentioned.</p>` : ""}
     </article>`;
     window.scrollTo(0, 0);
@@ -97,6 +100,14 @@
   function notFound() {
     app.innerHTML = `<div class="intro"><h1>Not found</h1><p><a href="#/">Go home</a></p></div>`;
   }
+
+  // Reading progress bar on articles
+  const bar = document.createElement("div"); bar.className = "progress"; document.body.appendChild(bar);
+  window.addEventListener("scroll", () => {
+    const on = !!document.querySelector(".article .prose");
+    const h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${on && h > 0 ? scrollY / h : 0})`;
+  }, { passive: true });
 
   function route() {
     const [, key, slug] = (location.hash.replace(/^#/, "") || "/").split("/");
@@ -114,6 +125,10 @@
     .then((data) => {
       site = data.site;
       posts = data.posts.sort((a, b) => b.date.localeCompare(a.date));
+      for (const key of Object.keys(SECTIONS)) {
+        const list = posts.filter((p) => p.section === key);
+        list.forEach((p, i) => { p.no = String(list.length - i).padStart(2, "0"); });
+      }
       window.addEventListener("hashchange", route);
       route();
     })

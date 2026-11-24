@@ -1,9 +1,10 @@
 {
   "site": {
-    "headline": "Hi, I'm Isaac.",
+    "headline": "I'm Isaac. I notice small problems, design my way through them, and tell the story of what I find.",
     "intro": [
-      "I write down product ideas, half-formed thoughts, and investment memos here so I can see whether they hold up. Most of it is a work in progress. If something sparks an idea, <a href=\"#/about\">reach out</a>."
-    ]
+      "Product concepts, short thoughts, and investment memos. Fewer pieces, made carefully. If one sparks something, <a href=\"#/about\">say hello</a>."
+    ],
+    "now": "Now: planning Season 1, a run of weekly product concepts."
   },
   "posts": [
     {

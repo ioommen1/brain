@@ -45,8 +45,15 @@ a { color: inherit; text-decoration: none; }
 main { min-height: 60vh; padding: 32px 0 64px; }
 
 /* Intro */
-.intro { margin: 8px 0 40px; max-width: 620px; }
-.intro h1 { font-size: 22px; font-weight: 500; margin: 0 0 8px; color: var(--fg); letter-spacing: -0.01em; }
+.intro { margin: 24px 0 56px; max-width: 760px; }
+.intro h1 { font-size: clamp(28px, 5.2vw, 46px); font-weight: 500; line-height: 1.12; margin: 0 0 18px; color: var(--fg); letter-spacing: -0.025em; }
+.intro p { font-size: 17px; max-width: 560px; }
+.now { display: inline-flex; align-items: center; gap: 10px; margin-top: 12px !important; font-size: 14px !important; color: var(--fg) !important;
+  background: var(--card); padding: 6px 14px 6px 12px; border-radius: 999px; }
+.now .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 0 var(--accent); animation: pulse 2.4s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,149,0,.5); } 70% { box-shadow: 0 0 0 8px rgba(255,149,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,149,0,0); } }
+@media (prefers-reduced-motion: reduce) { .now .dot { animation: none; } }
+.no { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .82em; margin-right: 10px; }
 .intro p { color: var(--muted); margin: 0 0 8px; }
 .intro a { color: var(--fg); border-bottom: 1px solid var(--faint); }
 .intro a:hover { color: var(--accent-text); border-color: var(--accent); }
@@ -103,10 +110,13 @@ main { min-height: 60vh; padding: 32px 0 64px; }
 .article .hero .cover { aspect-ratio: 16 / 9; position: relative; overflow: hidden; border: 1px solid var(--faint); background: var(--card); }
 .article .hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .prose { font-size: 17px; line-height: 1.75; }
+.prose { counter-reset: chapter; }
+.prose h2::before { counter-increment: chapter; content: counter(chapter, decimal-leading-zero); color: var(--muted); margin-right: 12px; }
 .prose h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--accent-text); margin: 40px 0 8px; }
 .prose h3 { font-size: 17px; font-weight: 600; margin: 28px 0 4px; }
 .prose a { border-bottom: 1px solid var(--accent); }
-.prose blockquote { margin: 24px 0; padding: 4px 0 4px 18px; border-left: 3px solid var(--accent); color: var(--muted); }
+.prose blockquote { margin: 36px 0; padding: 0 0 0 20px; border-left: 3px solid var(--accent); color: var(--fg); font-size: 24px; line-height: 1.35; letter-spacing: -0.01em; font-weight: 500; }
+.prose blockquote p { margin: 0; }
 .prose code { font-size: .88em; background: var(--card); padding: 1px 5px; }
 .prose table { width: 100%; border-collapse: collapse; font-size: 15px; margin: 20px 0; display: block; overflow-x: auto; }
 .prose th, .prose td { text-align: left; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--faint); }
@@ -130,6 +140,24 @@ main { min-height: 60vh; padding: 32px 0 64px; }
 .site-footer a:hover { color: var(--accent-text); }
 
 @media (max-width: 640px) {
+  .nav { gap: 18px; font-size: 16px; flex-wrap: nowrap; }
+  .now { border-radius: 14px; align-items: flex-start; }
+  .now .dot { margin-top: 6px; flex: none; }
   .gallery { grid-template-columns: 1fr; gap: 40px; }
   .notes li a { flex-direction: column; gap: 4px; }
 }
+
+/* Next story */
+.next { display: block; margin-top: 56px; padding: 22px 24px; background: var(--card); border: 1px solid var(--faint); transition: border-color .2s; }
+.next span { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
+.next strong { font-weight: 500; font-size: 19px; }
+.next:hover { border-color: var(--accent); }
+.next:hover strong { color: var(--accent-text); }
+
+/* Reading progress */
+.progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: 0 50%; z-index: 10; }
+
+/* Gentle page fade */
+main > * { animation: fade .35s ease both; }
+@keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { main > * { animation: none; } }
