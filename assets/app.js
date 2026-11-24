@@ -8,7 +8,7 @@
   };
   // Muted palette for generated covers (used when a post has no "cover" image)
   const PALETTE = [
-    ["#c4663a", "#e9a26f"], ["#3f5e57", "#7fa597"], ["#4b5a7a", "#93a2c4"],
+    ["#ff8a00", "#ffc46b"], ["#3f5e57", "#7fa597"], ["#4b5a7a", "#93a2c4"],
     ["#8a5a76", "#c99ab4"], ["#6b6a3c", "#b0ad6d"], ["#2f2f2d", "#6d6b66"],
   ];
   let posts = [];
