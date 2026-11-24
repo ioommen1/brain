@@ -13,12 +13,12 @@
       "slug": "spotify-rabbit-hole",
       "type": "feature",
       "app": "Spotify",
-      "title": "Rabbit Hole",
+      "title": "Finding new music on Spotify",
       "date": "2026-11-24",
       "readTime": "4 min read",
       "palette": 1,
       "mark": "One step further.",
-      "summary": "Radio keeps me close to what I know. Rabbit hole takes me one step further with every song.",
+      "summary": "Spotify keeps playing what I already know. Here's a feature that helps me find something new.",
       "week": 1,
       "scope": [
         "Problem framing",
@@ -26,7 +26,7 @@
         "Interaction design"
       ],
       "anim": "inkwaves",
-      "blurb": "A Spotify feature that takes you one song further from what you love."
+      "blurb": "A feature that takes you one song further from what you love."
     },
     {
       "section": "thoughts",

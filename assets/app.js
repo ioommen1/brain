@@ -295,6 +295,7 @@
   // ---------- Living covers: looping canvas animations, like a Spotify Canvas ----------
   // tiny deterministic noise for hand-drawn wobble
   const nz = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
+  const sn = (x, b) => { const i = Math.floor(x), f = x - i, e = f * f * (3 - 2 * f); return nz(i, b) * (1 - e) + nz(i + 1, b) * e; };  // smooth noise
   const ANIMS = {
     // Hand-drawn ink: a sage disc with an offset outline, three sound-wave arcs, and dots falling one step further
     // Flat marker drawing: bright green blob, a loose double pen outline, three thick marker waves
@@ -353,18 +354,23 @@
         ctx.fillStyle = C.ink; ctx.fill("evenodd");
       };
       // tapered ink stroke along a cubic curve: fat in the middle, pointed at the ends
-      const taper = (p0, p1, p2, p3, wMax, wMin, color) => {
+      const taper = (p0, p1, p2, p3, wMax, wMin, color, seed = 0, rough = 0) => {
         const B = (u, a, b, c, d) => (1 - u) ** 3 * a + 3 * (1 - u) ** 2 * u * b + 3 * (1 - u) * u * u * c + u ** 3 * d;
-        const top = [], bot = [], M = 28;
+        const top = [], bot = [], M = 48;
         for (let i = 0; i <= M; i++) {
           const u = i / M, x = B(u, p0[0], p1[0], p2[0], p3[0]), y = B(u, p0[1], p1[1], p2[1], p3[1]);
           const u2 = Math.min(1, u + 0.01), x2 = B(u2, p0[0], p1[0], p2[0], p3[0]), y2 = B(u2, p0[1], p1[1], p2[1], p3[1]);
           let dx = x2 - x, dy = y2 - y; const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
-          const wv = wMin + (wMax - wMin) * Math.sin(Math.PI * u) ** 0.7;
-          top.push([x - dy * wv / 2, y + dx * wv / 2]); bot.push([x + dy * wv / 2, y - dx * wv / 2]);
+          const lump = rough ? 1 + (sn(u * 6, seed) - 0.5) * rough + (sn(u * 14, seed + 3) - 0.5) * rough * 0.45 : 1;
+          const wv = (wMin + (wMax - wMin) * Math.sin(Math.PI * u) ** 0.55) * lump;
+          const sh = rough ? (sn(u * 4, seed + 9) - 0.5) * wMax * rough * 0.4 : 0;   // the stroke drifts slightly, like a hand
+          top.push([x - dy * (wv / 2 + sh), y + dx * (wv / 2 + sh)]); bot.push([x + dy * (wv / 2 - sh), y - dx * (wv / 2 - sh)]);
         }
         ctx.beginPath(); top.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]));
         bot.reverse().forEach((p) => ctx.lineTo(p[0], p[1])); ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+        if (rough) {   // soft, slightly uneven ends instead of clean cuts
+          [[p0, 0.75], [p3, 1]].forEach(([p, f], i) => { ctx.beginPath(); ctx.ellipse(p[0], p[1], wMin * f * (0.9 + nz(i, seed) * 0.5), wMin * f * 0.8, nz(i + 2, seed) * 3, 0, Math.PI * 2); ctx.fill(); });
+        }
       };
 
       // gentle bounce with squash and stretch
@@ -381,7 +387,7 @@
         const pulse = Math.max(0, Math.sin(t * 2.4 - k * 1.1)), lift = pulse * r * 0.03;
         const y = cy - r * 0.36 + k * r * 0.3 - lift, half = r * (0.6 - k * 0.11), bend = r * (0.22 - k * 0.03), jj = (i) => n(i, boil * 9 + k) * r * 0.012;
         const P = [[cx - half + jj(1), y + bend * 0.6], [cx - half * 0.4 + jj(2), y - bend * 0.4], [cx + half * 0.4 + jj(3), y - bend * 0.3], [cx + half + jj(4), y + bend * 0.75]];
-        taper(P[0], P[1], P[2], P[3], r * (0.15 - k * 0.022) * (1 + pulse * 0.08), r * 0.035, C.ink);
+        taper(P[0], P[1], P[2], P[3], r * (0.15 - k * 0.022) * (1 + pulse * 0.08), r * 0.05, C.ink, 40 + k * 7 + (boil % 3) * 0.37, 0.24);
         // highlight
         taper([cx - half * 0.32, y - bend * 0.02 - r * 0.03], [cx - half * 0.15, y - bend * 0.14 - r * 0.03], [cx + half * 0.05, y - bend * 0.14 - r * 0.03], [cx + half * 0.2, y - bend * 0.08 - r * 0.03], r * 0.022, r * 0.004, C.white);
       }
