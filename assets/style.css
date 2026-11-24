@@ -80,16 +80,18 @@ main { min-height: 60vh; padding: 32px 0 64px; }
 .filters button.on { background: var(--accent); color: var(--on-accent); padding: 4px 12px; font-weight: 500; }
 
 /* Card gallery */
-.gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 48px 28px; }
+.gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px 24px; }
 .card { display: block; }
 .card .cover {
   aspect-ratio: 4 / 5; width: 100%; overflow: hidden; background: var(--card);
   border: 1px solid var(--faint); position: relative;
 }
-.card .cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
-.card:hover .cover img, .card:hover .cover .art { transform: scale(1.03); }
-.card .title { margin: 14px 0 2px; font-size: 18px; color: var(--fg); }
-.card .sub { color: var(--muted); font-size: 16px; }
+.card .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.card .cover::after { content: ""; position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity .35s ease; pointer-events: none; z-index: 1; }
+.card .art .kicker, .card .art .mark { z-index: 2; }
+.card:hover .cover::after, .card:focus-visible .cover::after { opacity: .28; }
+.card .title { margin: 12px 0 2px; font-size: 16px; color: var(--fg); }
+.card .sub { color: var(--muted); font-size: 14.5px; }
 .card:hover .title { color: var(--accent-text); }
 
 /* generated cover art */
@@ -98,7 +100,7 @@ main { min-height: 60vh; padding: 32px 0 64px; }
   padding: 22px; color: rgba(255,255,255,.92); transition: transform .5s ease;
 }
 .art .kicker { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; opacity: .8; }
-.art .mark { font-size: clamp(34px, 6vw, 56px); line-height: 1.02; font-weight: 500; letter-spacing: -0.03em; }
+.art .mark { font-size: clamp(22px, 3.2vw, 36px); line-height: 1.02; font-weight: 500; letter-spacing: -0.03em; }
 .art .orb { position: absolute; border-radius: 50%; filter: blur(2px); opacity: .55; }
 
 /* Notes list */
@@ -155,7 +157,12 @@ main { min-height: 60vh; padding: 32px 0 64px; }
   .nav { gap: 14px; font-size: 15px; flex-wrap: nowrap; }
   .now { border-radius: 14px; align-items: flex-start; }
   .now .dot { margin-top: 6px; flex: none; }
-  .gallery { grid-template-columns: 1fr; gap: 40px; }
+  .gallery { grid-template-columns: repeat(2, 1fr); gap: 28px 14px; }
+  .art { padding: 14px; }
+  .art .mark { font-size: 20px; }
+  .art .kicker { font-size: 10px; }
+  .card .title { font-size: 15px; margin-top: 10px; }
+  .card .sub { font-size: 13.5px; }
   .notes li a { flex-direction: column; gap: 4px; }
 }
 
@@ -263,7 +270,6 @@ main > * { animation: fade .35s ease both; }
 .has-loupe, .has-loupe * { cursor: none !important; }
 .loupe-dot, .loupe-ring { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
 .loupe-dot { width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--accent); transition: opacity .2s; }
-.loupe-dot.hide { opacity: 0; }
 .loupe-ring { width: 0; height: 0; }
 .loupe-ring span {
   position: absolute; left: 0; top: 0; width: 30px; height: 30px; transform: translate(-50%, -50%);
@@ -271,9 +277,5 @@ main > * { animation: fade .35s ease both; }
   display: grid; place-items: center; font: 500 0px/1 var(--sans); color: var(--on-accent); letter-spacing: .02em;
   transition: width .3s cubic-bezier(.2,.8,.2,1), height .3s cubic-bezier(.2,.8,.2,1), background .25s, border-color .25s, font-size .2s;
 }
-.loupe-ring.link span { width: 42px; height: 42px; border-color: var(--accent); }
-.loupe-ring.lens span { width: 66px; height: 66px; background: var(--accent); border-color: var(--accent); font-size: 13px;
-  box-shadow: 0 0 0 1.5px rgba(255,255,255,.75), 0 8px 24px -10px rgba(120,50,15,.55); }
 .loupe-ring.press span { width: 24px; height: 24px; }
-.loupe-ring.lens.press span { width: 58px; height: 58px; }
 .loupe-out .loupe-dot, .loupe-out .loupe-ring { opacity: 0; }

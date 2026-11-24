@@ -160,22 +160,15 @@
   }, { passive: true });
 
   // ---------- Loupe cursor (desktop only) ----------
-  const LABELS = [[".card", "Read"], [".notes a", "Read"], [".cd", "Play"], [".book", "Pull"], [".paper .shot", "Open"], [".film", "Notes"], [".next", "Next"]];
   if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
     const dot = document.createElement("div"); dot.className = "loupe-dot";
     const ring = document.createElement("div"); ring.className = "loupe-ring"; ring.innerHTML = "<span></span>";
     document.body.append(ring, dot); document.documentElement.classList.add("has-loupe");
-    const label = ring.firstChild; const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let mx = -100, my = -100, rx = -100, ry = -100;
     addEventListener("mousemove", (e) => { mx = e.clientX; my = e.clientY; dot.style.transform = `translate(${mx}px, ${my}px)`; document.documentElement.classList.remove("loupe-out"); });
     document.addEventListener("mouseleave", () => document.documentElement.classList.add("loupe-out"));
     (function tick() { rx += (mx - rx) * (still ? 1 : 0.2); ry += (my - ry) * (still ? 1 : 0.2); ring.style.transform = `translate(${rx}px, ${ry}px)`; requestAnimationFrame(tick); })();
-    addEventListener("mouseover", (e) => {
-      const hit = LABELS.find(([sel]) => e.target.closest(sel));
-      ring.classList.toggle("lens", !!hit); dot.classList.toggle("hide", !!hit);
-      if (hit) label.textContent = hit[1];
-      ring.classList.toggle("link", !hit && !!e.target.closest("a, button"));
-    });
     addEventListener("mousedown", () => ring.classList.add("press")); addEventListener("mouseup", () => ring.classList.remove("press"));
   }
 
