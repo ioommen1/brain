@@ -271,7 +271,11 @@ main > * { animation: fade .35s ease both; }
 /* ---------- Loupe cursor ---------- */
 .has-loupe, .has-loupe * { cursor: none !important; }
 .loupe-dot, .loupe-ring { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
-.loupe-dot { width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--accent); transition: opacity .2s; }
+.loupe-dot { --w: 7px; --h: 7px; width: var(--w); height: var(--h); margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2); border-radius: 4px; background: var(--accent);
+  transition: width .28s cubic-bezier(.2,.8,.2,1), height .28s cubic-bezier(.2,.8,.2,1), margin .28s cubic-bezier(.2,.8,.2,1), border-radius .28s, opacity .2s; }
+.loupe-text .loupe-dot { --w: 2px; --h: var(--caret, 22px); border-radius: 1px; }
+.loupe-ring { transition: opacity .28s ease; }
+.loupe-text .loupe-ring { opacity: 0; }
 .loupe-ring { width: 0; height: 0; }
 .loupe-ring span {
   position: absolute; left: 0; top: 0; width: 30px; height: 30px; transform: translate(-50%, -50%);

@@ -269,6 +269,15 @@
     document.addEventListener("mouseleave", () => document.documentElement.classList.add("loupe-out"));
     (function tick() { rx += (mx - rx) * (still ? 1 : 0.2); ry += (my - ry) * (still ? 1 : 0.2); ring.style.transform = `translate(${rx}px, ${ry}px)`; requestAnimationFrame(tick); })();
     addEventListener("mousedown", () => ring.classList.add("press")); addEventListener("mouseup", () => ring.classList.remove("press"));
+    // Over readable text, the dot stretches into a text cursor sized to that text
+    const TEXT = ".prose p, .prose li, .prose h2, .prose h3, .prose h4, .article h1, .lede, .hero h1, .page-top h1, .facts div, .pt p, .pt h3, .disclaimer";
+    let lastText = null;
+    addEventListener("mouseover", (e) => {
+      const t = e.target.closest && !e.target.closest("a, button") ? e.target.closest(TEXT) : null;
+      if (t === lastText) return; lastText = t;
+      document.documentElement.classList.toggle("loupe-text", !!t);
+      if (t) dot.style.setProperty("--caret", Math.round(parseFloat(getComputedStyle(t).fontSize) * 1.25) + "px");
+    });
   }
 
   function route() {
