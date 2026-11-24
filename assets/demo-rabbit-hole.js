@@ -1,86 +1,156 @@
-// Playable Rabbit Hole demo. Songs and artists are invented; genres are real.
+// Playable Rabbit Hole demo, shown inside a Spotify-style Now Playing screen.
+// Songs and artists are invented; genres are real. No Spotify logo or brand font is used.
 (function () {
   const GRAPH = {
-    "Indie folk": ["Chamber pop", "Americana"], "Chamber pop": ["Baroque pop", "Art rock"], "Baroque pop": ["Bossa nova", "French pop"],
-    "Bossa nova": ["Brazilian jazz", "Samba"], "Brazilian jazz": ["Ethio-jazz", "Spiritual jazz"], "Ethio-jazz": ["Afrobeat", "Desert blues"],
-    "Afrobeat": ["Highlife", "Afro-house"], "Highlife": ["Palm-wine", "Soukous"], "Americana": ["Bluegrass", "Desert blues"],
-    "Bluegrass": ["Irish folk", "Appalachian folk"], "Art rock": ["Krautrock", "Post-punk"], "Krautrock": ["Ambient", "Kosmische"],
-    "Post-punk": ["Coldwave", "Krautrock"], "Ambient": ["Gagaku", "Minimalism"], "French pop": ["Yé-yé", "City pop"],
+    "Indie folk": ["Americana", "Chamber pop"], "Chamber pop": ["Baroque pop", "Art rock"], "Baroque pop": ["French pop", "Bossa nova"],
+    "Bossa nova": ["Samba", "Brazilian jazz"], "Samba": ["Choro", "Bossa nova"], "Choro": ["Brazilian jazz", "Samba"],
+    "Brazilian jazz": ["Ethio-jazz", "Spiritual jazz"], "Ethio-jazz": ["Desert blues", "Afrobeat"], "Afrobeat": ["Highlife", "Afro-house"],
+    "Highlife": ["Palm-wine", "Soukous"], "Americana": ["Bluegrass", "Desert blues"], "Bluegrass": ["Appalachian folk", "Irish folk"],
+    "Appalachian folk": ["Ethio-jazz", "Irish folk"], "Art rock": ["Krautrock", "Post-punk"], "Krautrock": ["Ambient", "Kosmische"],
+    "Post-punk": ["Coldwave", "Krautrock"], "Ambient": ["Minimalism", "Gagaku"], "French pop": ["City pop", "Yé-yé"],
     "City pop": ["Shibuya-kei", "Synth funk"], "Spiritual jazz": ["Ambient", "Minimalism"], "Desert blues": ["Gnawa", "Ethio-jazz"],
-    "Samba": ["Choro", "Bossa nova"], "Minimalism": ["Gamelan", "Ambient"], "Coldwave": ["Minimal synth", "Ambient"],
+    "Minimalism": ["Gamelan", "Ambient"], "Coldwave": ["Minimal synth", "Ambient"],
   };
   const ALL = [...new Set([...Object.keys(GRAPH), ...Object.values(GRAPH).flat()])];
-  const STARTS = [
-    { title: "Paper Lanterns", artist: "The Quiet Hours", genre: "Indie folk", hue: 28 },
-    { title: "Static Garden", artist: "Neon Paper", genre: "Art rock", hue: 210 },
-    { title: "Late Bloom", artist: "Ana Varela", genre: "Bossa nova", hue: 150 },
-  ];
+  const START = { title: "Late Bloom", artist: "Ana Varela", genre: "Bossa nova", hue: 150 };
   const A = ["Golden", "Slow", "Hollow", "Velvet", "Distant", "Paper", "Quiet", "Electric", "Lantern", "Salt", "Midnight", "Copper", "Glass", "Wild", "Low", "Soft"];
   const N = ["River", "Weather", "Rooms", "Orbit", "Harbor", "Echo", "Garden", "Signal", "Tides", "Hours", "Mirrors", "Fields", "Engine", "Letters", "Dust", "Moons"];
   const F = ["Mara", "Kofi", "Ines", "Taro", "Lena", "Odile", "Sami", "Yuki", "Bea", "Tomás", "Nadia", "Elio", "Aster", "Juno"];
   const L = ["Okafor", "Silva", "Mori", "Haddad", "Laurent", "Quinn", "Abebe", "Varga", "Ross", "Nakamura", "Duarte", "Bell"];
   const BANDS = ["The Long Weather", "Small Harbors", "Glass Orchard", "Night Atlas", "Copper Moth", "Velvet Ferry", "Saltwater Choir", "Low Orbit"];
-  const rnd = (seed) => { let x = Math.sin(seed * 9301 + 49297) * 233280; return x - Math.floor(x); };
-  const pick = (arr, seed) => arr[Math.floor(rnd(seed) * arr.length)];
+  const rnd = (s) => { const x = Math.sin(s * 9301 + 49297) * 233280; return x - Math.floor(x); };
+  const pick = (arr, s) => arr[Math.floor(rnd(s) * arr.length)];
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+  const I = {
+    down: '<path d="M6 9l6 6 6-6"/>',
+    more: '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+    heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+    plus: '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+    check: '<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 10"/>',
+    shuffle: '<path d="M4 7h3l10 10h3M4 17h3l3-3M14 10l3-3h3M18 5l2 2-2 2M18 15l2 2-2 2"/>',
+    prev: '<path d="M7 6v12M18 6l-9 6 9 6z"/>',
+    next: '<path d="M17 6v12M6 6l9 6-9 6z"/>',
+    play: '<path d="M9 7l9 5-9 5z"/>',
+    pause: '<path d="M9 7v10M15 7v10"/>',
+    repeat: '<path d="M5 10V8a2 2 0 0 1 2-2h11l-2-2M19 14v2a2 2 0 0 1-2 2H6l2 2"/>',
+    radio: '<circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"/>',
+    hole: '<ellipse cx="12" cy="15" rx="8" ry="3.4"/><circle cx="9" cy="7" r="1.3"/><circle cx="12.5" cy="9.5" r="1.1"/><circle cx="15" cy="12" r="0.9"/>',
+    queue: '<path d="M4 7h11M4 12h11M4 17h7M18 14v6M15 17h6"/>',
+    share: '<path d="M12 4v11M8 8l4-4 4 4M5 13v6h14v-6"/>',
+    search: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/>',
+    library: '<path d="M5 4v16M10 4v16M15 5l4 15"/>',
+  };
+  const ic = (n, cls = "", fill = false) => `<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true" ${fill ? 'fill="currentColor" stroke="none"' : 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"'}>${I[n]}</svg>`;
+
   function mount(el) {
-    let trail = [], branch = 0, saved = null;
-    const seen = new Set();
+    let trail = [{ ...START }], mode = "album", branch = 0, menu = false, saved = false, playing = true, toast = "";
+    const seen = new Set([START.title]);
+    const ALBUM = [START, { title: "Window Seat", artist: START.artist, genre: START.genre, hue: 150 }, { title: "Agua Morna", artist: START.artist, genre: START.genre, hue: 150 }, { title: "Small Hours", artist: START.artist, genre: START.genre, hue: 150 }];
+    const dur = (t) => `${2 + (t.length % 3)}:${String(10 + (t.length * 7) % 49).padStart(2, "0")}`;
 
     function nextSong() {
-      const cur = trail[trail.length - 1], used = new Set(trail.map((s) => s.genre));
+      const cur = trail[trail.length - 1], used = new Set(trail.map((x) => x.genre));
       const opts = (GRAPH[cur.genre] || []).filter((g) => !used.has(g));
       const pool = opts.length ? opts : ALL.filter((g) => !used.has(g));
       const genre = pool[(trail.length + branch) % pool.length];
       let title, artist, k = 0;
       do {
-        const s = trail.length * 31 + branch * 97 + k++;
-        title = `${pick(A, s)} ${pick(N, s + 3)}`;
-        artist = rnd(s + 7) > 0.45 ? `${pick(F, s + 5)} ${pick(L, s + 9)}` : pick(BANDS, s + 11);
+        const sd = trail.length * 31 + branch * 97 + k++;
+        title = `${pick(A, sd)} ${pick(N, sd + 3)}`;
+        artist = rnd(sd + 7) > 0.45 ? `${pick(F, sd + 5)} ${pick(L, sd + 9)}` : pick(BANDS, sd + 11);
       } while (seen.has(title) && k < 40);
       seen.add(title);
-      return { title, artist, genre, hue: (cur.hue + 24 + Math.floor(rnd(trail.length + branch) * 18)) % 360 };
+      return { title, artist, genre, hue: (cur.hue + 26 + Math.floor(rnd(trail.length + branch) * 18)) % 360 };
     }
-
-    function art(s, size) {
-      return `<span class="rh-art" style="--h:${s.hue};width:${size}px;height:${size}px"></span>`;
-    }
+    const art = (x, cls = "") => `<span class="dk-art ${cls}" style="--ah:${x.hue}" aria-hidden="true"></span>`;
 
     function render() {
-      if (!trail.length) {
-        el.innerHTML = `<div class="rh">
-          <div class="rh-top"><span>Start from a song you love</span></div>
-          <div class="rh-starts">${STARTS.map((s, i) => `<button type="button" class="rh-start" data-s="${i}">${art(s, 44)}<span><b>${esc(s.title)}</b><i>${esc(s.artist)} · ${esc(s.genre)}</i></span></button>`).join("")}</div>
-        </div>`;
-        el.querySelectorAll(".rh-start").forEach((b) => b.addEventListener("click", () => {
-          const s = STARTS[+b.dataset.s]; trail = [{ ...s }]; seen.clear(); seen.add(s.title); branch = 0; saved = null; render();
-        }));
-        return;
-      }
-      const cur = trail[trail.length - 1], steps = trail.length - 1;
-      el.innerHTML = `<div class="rh">
-        <div class="rh-top"><span>Rabbit hole from <b>${esc(trail[0].title)}</b></span><span>${steps ? `${steps} step${steps > 1 ? "s" : ""} in` : "Starting point"}</span></div>
-        <div class="rh-trail" role="list">${trail.map((s, i) => `<button type="button" role="listitem" class="rh-dot${i === trail.length - 1 ? " on" : ""}" data-i="${i}" style="--h:${s.hue}" title="${esc(s.title)} · ${esc(s.genre)}" aria-label="Go back to ${esc(s.title)}"></button>`).join('<span class="rh-link"></span>')}</div>
-        <div class="rh-now">${art(cur, 88)}<div class="rh-meta"><div class="rh-genre">${esc(cur.genre)}</div><div class="rh-title">${esc(cur.title)}</div><div class="rh-artist">${esc(cur.artist)}</div></div></div>
-        <div class="rh-dist"><span>Where you started</span><div class="rh-bar"><i style="width:${Math.min(100, steps * 11)}%"></i></div><span>Somewhere new</span></div>
-        <div class="rh-actions">
-          <button type="button" class="rh-go">One step further</button>
-          <button type="button" class="rh-save"${steps < 2 ? " disabled" : ""}>Save trail</button>
-          <button type="button" class="rh-reset">Start over</button>
+      const cur = trail[trail.length - 1], rh = mode === "rabbit", steps = trail.length - 1;
+      const main = rh
+        ? `<div class="dk-hero" style="--hh:${cur.hue}">
+             <div class="dk-hero-art">${trail.slice(-4).map((x) => art(x)).join("")}</div>
+             <div class="dk-hero-txt"><small>Rabbit hole</small><div class="dk-title">From ${esc(trail[0].title)}</div>
+               <span>${steps ? `${steps} step${steps > 1 ? "s" : ""} · ${esc(trail[0].genre)} → ${esc(cur.genre)}` : "Press next to go one step further"}</span></div>
+           </div>
+           <div class="dk-bar">
+             <button type="button" class="dk-bigplay" aria-label="${playing ? "Pause" : "Play"}">${ic(playing ? "pause" : "play", "", !playing)}</button>
+             <button type="button" class="dk-savebtn${saved ? " on" : ""}">${ic(saved ? "check" : "plus")}${saved ? "Saved" : "Save as playlist"}</button>
+           </div>
+           <div class="dk-trail" role="list" aria-label="Trail">${trail.map((x, i) => `<button type="button" role="listitem" class="dk-dot${i === trail.length - 1 ? " on" : ""}" data-i="${i}" style="--dh:${x.hue}" title="Branch from ${esc(x.title)}" aria-label="Branch from ${esc(x.title)}"></button>`).join('<i class="dk-link"></i>')}</div>
+           <div class="dk-table">${trail.map((x, i) => `<button type="button" class="dk-row${i === trail.length - 1 ? " on" : ""}" data-i="${i}">
+               <span class="n">${i === trail.length - 1 && playing ? '<i class="eq"><b></b><b></b><b></b></i>' : i + 1}</span>${art(x, "sm")}
+               <span class="t"><b>${esc(x.title)}</b><small>${esc(x.artist)}</small></span><span class="g">${esc(x.genre)}</span><span class="d">${dur(x.title)}</span></button>`).join("")}</div>`
+        : `<div class="dk-hero" style="--hh:${START.hue}">
+             <div class="dk-hero-art">${art(START)}</div>
+             <div class="dk-hero-txt"><small>Album</small><div class="dk-title">${esc(START.title)}</div><span>${esc(START.artist)} · 2024 · 4 songs</span></div>
+           </div>
+           <div class="dk-bar"><button type="button" class="dk-bigplay" aria-label="${playing ? "Pause" : "Play"}">${ic(playing ? "pause" : "play", "", !playing)}</button>
+             <span class="dk-tip">Open ⋯ on the right to find the new option</span></div>
+           <div class="dk-table">${ALBUM.map((x, i) => `<div class="dk-row${i === 0 ? " on" : ""}"><span class="n">${i === 0 && playing ? '<i class="eq"><b></b><b></b><b></b></i>' : i + 1}</span>
+               <span class="t"><b>${esc(x.title)}</b><small>${esc(x.artist)}</small></span><span class="d">${dur(x.title)}</span></div>`).join("")}</div>`;
+
+      el.innerHTML = `<div class="dk-win">
+        <div class="dk-top"><span class="dk-lights"><i></i><i></i><i></i></span><span class="dk-search">${ic("search")}What do you want to play?</span><span class="dk-av">I</span></div>
+        <div class="dk-body">
+          <div class="dk-rail"><span class="dk-lib">${ic("library")}</span><span class="dk-tile" style="--ah:270"></span><span class="dk-tile" style="--ah:20"></span>${rh ? art(cur, "dk-tile") : ""}</div>
+          <div class="dk-main">${main}</div>
+          <div class="dk-side">
+            <div class="dk-side-h"><b>${rh ? "Rabbit hole" : esc(START.title)}</b><button type="button" class="dk-more" aria-label="More options">${ic("more", "", true)}</button></div>
+            ${art(cur, "big")}
+            <div class="dk-np"><span><b>${esc(cur.title)}</b><small>${esc(cur.artist)}</small></span><span class="dk-ok">${ic("check")}</span></div>
+            ${rh ? `<div class="dk-card"><small>Up next</small><span>One step further from ${esc(cur.genre)}</span></div>` : ""}
+            ${menu ? `<div class="dk-menu" role="menu">
+              <button type="button" role="menuitem" class="dk-mi">${ic("plus")}Add to playlist</button>
+              <button type="button" role="menuitem" class="dk-mi">${ic("queue")}Add to queue</button>
+              <button type="button" role="menuitem" class="dk-mi">${ic("radio")}Go to song radio</button>
+              <button type="button" role="menuitem" class="dk-mi dk-new">${ic("hole")}Go down the rabbit hole<em>New</em></button>
+              <button type="button" role="menuitem" class="dk-mi">${ic("share")}Share</button>
+            </div>` : ""}
+          </div>
         </div>
-        ${saved ? `<div class="rh-saved"><div class="rh-saved-h">Saved playlist · Rabbit hole from ${esc(trail[0].title)}</div><ol>${saved.map((s) => `<li>${esc(s.title)} <i>${esc(s.artist)} · ${esc(s.genre)}</i></li>`).join("")}</ol></div>` : ""}
-        <div class="rh-hint">Tap any dot to branch from there.</div>
+        <div class="dk-player">
+          <div class="dk-now">${art(cur, "sm")}<span><b>${esc(cur.title)}</b><small>${esc(cur.artist)}</small></span></div>
+          <div class="dk-ctrl">
+            <div class="dk-btns">
+              <button type="button" class="dk-ib on" aria-label="Shuffle">${ic("shuffle")}</button>
+              <button type="button" class="dk-ib dk-prev" aria-label="Previous">${ic("prev", "", true)}</button>
+              <button type="button" class="dk-play" aria-label="${playing ? "Pause" : "Play"}">${ic(playing ? "pause" : "play", "", !playing)}</button>
+              <button type="button" class="dk-ib dk-next${rh ? " glow" : ""}" aria-label="${rh ? "One step further" : "Next"}">${ic("next", "", true)}</button>
+              <button type="button" class="dk-ib" aria-label="Repeat">${ic("repeat")}</button>
+            </div>
+            <div class="dk-prog"><span>0:43</span><span class="dk-track"><i></i></span><span>${dur(cur.title)}</span></div>
+          </div>
+          <div class="dk-vol">${ic("queue")}<span class="dk-track sm"><i></i></span></div>
+        </div>
+        ${toast ? `<div class="dk-toast">${esc(toast)}</div>` : ""}
       </div>`;
-      el.querySelector(".rh-go").addEventListener("click", () => { trail.push(nextSong()); saved = null; render(); el.querySelector(".rh-go").focus(); });
-      el.querySelector(".rh-save").addEventListener("click", () => { saved = trail.slice(); render(); });
-      el.querySelector(".rh-reset").addEventListener("click", () => { trail = []; render(); });
-      el.querySelectorAll(".rh-dot").forEach((d) => d.addEventListener("click", () => {
+
+      const $ = (q) => el.querySelector(q);
+      $(".dk-more").addEventListener("click", (e) => { e.stopPropagation(); menu = !menu; render(); });
+      el.querySelectorAll(".dk-mi:not(.dk-new)").forEach((b) => b.addEventListener("click", () => { menu = false; render(); }));
+      const nw = $(".dk-new"); if (nw) nw.addEventListener("click", () => {
+        menu = false; mode = "rabbit"; trail = [trail[trail.length - 1]]; seen.clear(); seen.add(trail[0].title); saved = false; playing = true; flash("Rabbit hole started. Press next.");
+      });
+      el.querySelectorAll(".dk-bigplay, .dk-play").forEach((b) => b.addEventListener("click", () => { playing = !playing; render(); }));
+      $(".dk-next").addEventListener("click", () => {
+        if (mode !== "rabbit") { menu = true; render(); return; }
+        trail.push(nextSong()); saved = false; playing = true; render();
+      });
+      $(".dk-prev").addEventListener("click", () => { if (mode === "rabbit" && trail.length > 1) { trail.pop(); render(); } });
+      const sv = $(".dk-savebtn"); if (sv) sv.addEventListener("click", () => {
+        if (trail.length < 2) return flash("Take a few steps first");
+        saved = true; flash(`Saved "Rabbit hole from ${trail[0].title}" to Your Library`);
+      });
+      el.querySelectorAll(".dk-dot, button.dk-row").forEach((d) => d.addEventListener("click", () => {
         const i = +d.dataset.i; if (i === trail.length - 1) return;
-        trail = trail.slice(0, i + 1); branch++; saved = null; render();
+        trail = trail.slice(0, i + 1); branch++; saved = false; flash("Branched. The next step takes a new path.");
       }));
-      const t = el.querySelector(".rh-trail"); t.scrollLeft = t.scrollWidth;
+      const t = $(".dk-trail"); if (t) t.scrollLeft = t.scrollWidth;
     }
+    el.addEventListener("click", (e) => { if (menu && !e.target.closest(".dk-menu, .dk-more")) { menu = false; render(); } });
+    let tt;
+    function flash(msg) { toast = msg; render(); clearTimeout(tt); tt = setTimeout(() => { toast = ""; render(); }, 2000); }
     render();
   }
   window.mountDemos = (root) => root.querySelectorAll('.demo[data-demo="rabbit-hole"]').forEach(mount);
