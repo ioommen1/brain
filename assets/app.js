@@ -215,6 +215,19 @@
     });
   }
 
+  // ---------- Ideas: a plain running list ----------
+  async function ideas() {
+    const data = await fetch("content/ideas.json").then((r) => r.json()).catch(() => null);
+    if (!data) return notFound();
+    const list = [...data.ideas].sort((a, b) => b.date.localeCompare(a.date));
+    app.innerHTML = `<section class="page-top"><h1>${esc(data.title)}</h1></section>
+      <ul class="ideas">${list.map((it) => `<li>
+        <span class="i-date mono">${shortDate(it.date)}</span>
+        <span class="i-main"><span class="i-title">${esc(it.title)}</span>${it.note ? `<span class="i-note">${esc(it.note)}</span>` : ""}</span>
+        ${it.concept ? `<a class="i-link" href="#/concepts/${esc(it.concept)}">Became a concept →</a>` : ""}
+      </li>`).join("")}</ul>`;
+  }
+
   async function about() {
     const md = await fetch("content/about.md").then((r) => r.text()).catch(() => "");
     app.innerHTML = `<article class="article"><h1>About</h1><div class="prose">${marked.parse(md)}</div></article>`;
@@ -252,6 +265,7 @@
     if (!key) index("");
     else if (key === "about") about();
     else if (key === "shelf") shelf();
+    else if (key === "ideas") ideas();
     else if (SECTIONS[key] && slug) article(key, slug);
     else if (SECTIONS[key]) index(key);
     else notFound();

@@ -1,0 +1,8 @@
+{
+  "title": "Ideas I haven't built yet.",
+  "ideas": [
+    { "title": "Blood test results a normal person can actually read", "date": "2026-11-20" },
+    { "title": "A sleep score that tells you one thing to change tonight", "date": "2026-11-12" },
+    { "title": "See what a medical bill will cost before you pay it", "note": "Insurance math, done for you.", "date": "2026-11-03" }
+  ]
+}

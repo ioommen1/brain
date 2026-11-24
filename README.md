@@ -27,3 +27,7 @@ Edit `content/shelf.json`. Each row has a `kind`: `cd`, `book`, `paper` or `film
 
 - **Real covers:** put an image in `content/img/shelf/` and set `"cover": "content/img/shelf/name.jpg"` (square for CDs, 2:3 for films).
 - **Papers:** also take `venue` and `link`. For the rounded screenshot, save a crop of the paper's first page (title + abstract, roughly 4:3) to `content/img/shelf/` and set it as `cover`. The rounded corners and shadow are added automatically.
+
+## Ideas
+
+Add a line to `content/ideas.json` with `title`, `date`, and an optional `note`. When an idea becomes a concept, add `"concept": "<concept-slug>"` and it links to it.

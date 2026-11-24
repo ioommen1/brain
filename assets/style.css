@@ -155,7 +155,11 @@ main { min-height: 60vh; padding: 32px 0 64px; }
 .site-footer a:hover { color: var(--accent-text); }
 
 @media (max-width: 640px) {
-  .nav { gap: 14px; font-size: 15px; flex-wrap: nowrap; }
+  .nav { gap: 16px; font-size: 15px; flex-wrap: nowrap; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; padding-right: 20px;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav a { flex: none; }
+  .theme-toggle { flex: none; }
   .now { border-radius: 14px; align-items: flex-start; }
   .now .dot { margin-top: 6px; flex: none; }
   .gallery { grid-template-columns: repeat(2, 1fr); gap: 28px 14px; }
@@ -384,3 +388,14 @@ main > * { animation: fade .35s ease both; }
 .page-top.with-season { max-width: none; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: 24px 64px; align-items: end; }
 .page-top.with-season .season { grid-column: 2; grid-row: auto; }
 @media (max-width: 760px) { .page-top.with-season { grid-template-columns: minmax(0, 1fr); } .page-top.with-season .season { grid-column: 1; } }
+
+/* ---------- Ideas ---------- */
+.ideas { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--fg); }
+.ideas li { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; gap: 20px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid var(--faint); position: relative; }
+.ideas li::before { content: ""; position: absolute; left: -18px; top: 26px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); transform: scale(0); transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+.ideas li:hover::before { transform: scale(1); }
+.i-date { color: var(--muted); }
+.i-title { font-size: 18px; letter-spacing: -0.01em; }
+.i-note { display: block; color: var(--muted); font-size: 14.5px; margin-top: 2px; }
+.i-link { font-size: 14px; color: var(--accent-text); white-space: nowrap; }
+@media (max-width: 640px) { .ideas li { grid-template-columns: minmax(0, 1fr); gap: 2px; } .ideas li::before { display: none; } .i-link { white-space: normal; } }
