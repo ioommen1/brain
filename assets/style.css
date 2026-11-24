@@ -1,14 +1,14 @@
 :root {
-  --bg: #f2f0eb;
+  --bg: #faf9f6;
   --fg: #3a3a38;
   --muted: #8d8c88;
-  --faint: #dcd9d2;
+  --faint: #e6e3dd;
   --accent: #d9622b;
   --accent-text: #d9622b;
-  --card: #e8e5df;
+  --card: #f0eee9;
   --on-accent: #ffffff;
-  --paper-opacity: 1;
-  --chip: rgba(70, 55, 40, .07);
+  --paper-opacity: .55;
+  --chip: rgba(70, 55, 40, .055);
   --sans: "Inter", system-ui, -apple-system, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
