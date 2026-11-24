@@ -341,10 +341,10 @@
 
   function route() {
     const [, key, slug] = (location.hash.replace(/^#/, "") || "/").split("/");
-    const active = key || "";
+    const active = key || "concepts";
     document.querySelectorAll("[data-nav]").forEach((a) => a.classList.toggle("active", a.dataset.nav === active));
     clearToc();
-    if (!key) index("");
+    if (!key) index("concepts");
     else if (key === "about") about();
     else if (key === "shelf") shelf();
     else if (key === "ideas") ideas();
