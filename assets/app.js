@@ -132,6 +132,7 @@
       ${key === "memos" ? `<p class="disclaimer">These are personal views for discussion only and are not investment advice. I may hold positions in securities mentioned.</p>` : ""}
     </article></div>`;
     window.scrollTo(0, 0);
+    window.mountDemos && window.mountDemos(app);
     buildToc();
   }
 

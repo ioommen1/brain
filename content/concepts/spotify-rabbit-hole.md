@@ -46,6 +46,8 @@ The best starting point is a song I already love, because that's where I already
 
 The first few still feel like the song I picked. Ten songs in, I'm somewhere I've never been, and I can see exactly how I got there.
 
+<div class="demo" data-demo="rabbit-hole"></div>
+
 ## How it works
 
 #### Entry point
