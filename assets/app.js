@@ -160,6 +160,42 @@
     spyFn = spy; addEventListener("scroll", spy, { passive: true }); spy();
   }
 
+  // ---------- Brush-pen outlines: one stroke weight, slightly wobbly, shapes that don't quite close ----------
+  function inkPath(pts, seed) {
+    const R = (i) => nz(i, seed) - 0.5;
+    const P = pts.map(([x, y], i) => [x + R(i * 3) * 2.4, y + R(i * 3 + 1) * 2.4]);   // corners drift a little
+    const lean = R(99) * 2.2; P[0][0] += lean; P[1][0] += lean;                        // the top edge leans
+    const seg = [], n = P.length;
+    for (let i = 0; i < n; i++) {
+      const a = P[i], b = P[(i + 1) % n], L = Math.hypot(b[0] - a[0], b[1] - a[1]), k = Math.max(1, Math.round(L / 34));
+      for (let j = 0; j < k; j++) seg.push([a, b, j / k, (j + 1) / k, L]);
+    }
+    const at = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+    const start = 0.06 + R(7) * 0.06, overshoot = R(8) > 0 ? 0.05 + R(9) * 0.04 : -0.04;     // gap or overlap where it meets
+    const first = seg[0], s0 = at(first[0], first[1], first[2] + (first[3] - first[2]) * start * 3);
+    let d = `M${s0[0].toFixed(1)},${s0[1].toFixed(1)}`;
+    seg.forEach(([a, b, t0, t1, L], i) => {
+      const e = at(a, b, t1), m = at(a, b, (t0 + t1) / 2), nx = -(b[1] - a[1]) / L, ny = (b[0] - a[0]) / L, bump = R(i + 20) * 2.2;
+      d += ` Q${(m[0] + nx * bump).toFixed(1)},${(m[1] + ny * bump).toFixed(1)} ${e[0].toFixed(1)},${e[1].toFixed(1)}`;
+    });
+    const endT = Math.max(0.01, start * 3 + overshoot * 3), e2 = at(first[0], first[1], first[2] + (first[3] - first[2]) * Math.min(1, endT));
+    d += ` L${e2[0].toFixed(1)},${e2[1].toFixed(1)}`;
+    return d;
+  }
+  function inkOutline(el, seed) {
+    el.querySelector(":scope > svg.ink")?.remove();
+    const w = el.offsetWidth, h = el.offsetHeight; if (!w || !h) return;
+    const shape = el.classList.contains("tg") ? [[10, 0], [w, 0], [w, h], [10, h], [0, h / 2]] : [[1, 1], [w - 1, 1], [w - 1, h - 1], [1, h - 1]];
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("class", "ink"); svg.setAttribute("width", w + 8); svg.setAttribute("height", h + 8); svg.setAttribute("viewBox", `-4 -4 ${w + 8} ${h + 8}`);
+    svg.innerHTML = `<path d="${inkPath(shape, seed)}"/>`;
+    el.appendChild(svg);
+  }
+  function inkAll(root, sel = ".row-of .sp, .plank, .rbox .box, .fav-tag .tg, .pv:not(.has-img)") {
+    root.querySelectorAll(sel).forEach((el, i) => inkOutline(el, 13 + i * 7));
+  }
+  let inkTimer; addEventListener("resize", () => { clearTimeout(inkTimer); inkTimer = setTimeout(() => { const p = document.querySelector(".shelf-page"); if (p) inkAll(p); }, 150); });
+
   // ---------- Shelf: a real bookshelf ----------
   async function shelf() {
     const data = await fetch("content/shelf.json").then((r) => r.json()).catch(() => null);
@@ -210,15 +246,8 @@
         <span class="i-date mono">${shortDate(x.date)}</span>
         <span class="i-main"><span class="i-title">${esc(x.title)}</span><span class="i-note">${esc([x.by, x.type].filter(Boolean).join(" · "))}</span></span>
       </li>`).join("")}</ul></section>` : "";
-    const STYLES = [["watercolor", "Watercolor"], ["anthropic", "Anthropic"], ["clay", "Clay"]];
-    let chosen = "anthropic"; try { chosen = localStorage.getItem("shelf-style") || chosen; } catch (e) {}
-    app.innerHTML = `<div class="style-pick" role="group" aria-label="Shelf style">${STYLES.map(([k, l]) => `<button type="button" data-st="${k}" class="${k === chosen ? "on" : ""}">${l}</button>`).join("")}</div>
-      <div class="shelf-page" data-style="${chosen}">${(data.shelves || data.rows.map((r) => [r.key])).map(shelfHtml).join("")}</div>${logHtml}`;
-    app.querySelectorAll(".style-pick button").forEach((b) => b.addEventListener("click", () => {
-      app.querySelector(".shelf-page").dataset.style = b.dataset.st;
-      app.querySelectorAll(".style-pick button").forEach((x) => x.classList.toggle("on", x === b));
-      try { localStorage.setItem("shelf-style", b.dataset.st); } catch (e) {}
-    }));
+    app.innerHTML = `<div class="shelf-page" data-style="watercolor">${(data.shelves || data.rows.map((r) => [r.key])).map(shelfHtml).join("")}</div>${logHtml}`;
+    inkAll(app);
 
     const detail = (it) => {
       if (it.kind === "recipe") return `<div class="pulled-in recipe-in"><div class="pv recipe-card" style="--c:${tint(it.color)}"><span>${esc(it.title)}</span><small>${esc(it.time || "")}</small></div><div class="pt">
@@ -243,7 +272,7 @@
       const reset = () => { unit.querySelectorAll(".sp.on").forEach((x) => x.classList.remove("on")); out.innerHTML = ""; };
       unit.querySelectorAll(".sp").forEach((b) => b.addEventListener("click", () => {
         const was = b.classList.contains("on"); reset(); if (was) return;
-        b.classList.add("on"); out.innerHTML = detail(all[+b.dataset.i]);
+        b.classList.add("on"); out.innerHTML = detail(all[+b.dataset.i]); inkAll(out, ".pv:not(.has-img)");
         out.querySelector(".close").addEventListener("click", reset);
       }));
     });
@@ -337,7 +366,7 @@
       };
       ctx.beginPath(); ring(r, 4, 0); ctx.fillStyle = C.green; ctx.fill();
       // outline as a band between two rough edges, so its thickness varies like a marker
-      ctx.beginPath(); ring(r * 1.085, 9, (boil % 2) * 0.4); ring(r * 0.985, 4, 0); ctx.fillStyle = C.ink; ctx.fill("evenodd");
+      ctx.beginPath(); ring(r * 1.055, 9, (boil % 2) * 0.4); ring(r * 0.99, 4, 0); ctx.fillStyle = C.ink; ctx.fill("evenodd");
       // chunky waves
       ctx.strokeStyle = C.ink; ctx.lineCap = "round"; ctx.lineJoin = "round";
       const B = (u, a, b, c, e) => (1 - u) ** 3 * a + 3 * (1 - u) ** 2 * u * b + 3 * (1 - u) * u * u * c + u ** 3 * e;

@@ -748,3 +748,14 @@ a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color 
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 55%, #2a1a0a), inset 0 0 6px 2px color-mix(in srgb, var(--c) 62%, #2a1a0a) !important;
 }
 .shelf-page[data-style="watercolor"] .row-of .book .t, .shelf-page[data-style="watercolor"] .row-of .film .t { color: color-mix(in srgb, var(--ink) 92%, transparent); }
+
+/* Brush-pen outlines over the watercolor */
+svg.ink { position: absolute; left: -4px; top: -4px; overflow: visible; pointer-events: none; z-index: 3; }
+svg.ink path { fill: none; stroke: var(--line); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.rbox .box, .pv, .fav-tag .tg { position: relative; }
+.rbox .box svg.ink { z-index: 3; }
+.style-pick { display: none; }
+/* one outline only: the drawn line */
+.shelf-page .pv.recipe-card, .shelf-page .pv.cover-book, .shelf-page .pv.cover-film, .shelf-page .pv.cover-cd, .shelf-page .pv.paper-shot { border: 0 !important; }
+/* the recipe box hides the bottoms of the cards */
+.shelf-page[data-style="watercolor"] .rbox .box::before { opacity: 1 !important; mix-blend-mode: normal !important; background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,.3), transparent 55%), #d9b48a !important; }
