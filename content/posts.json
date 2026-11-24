@@ -25,7 +25,8 @@
         "Exploration",
         "Interaction design"
       ],
-      "anim": "inkwaves"
+      "anim": "inkwaves",
+      "blurb": "A Spotify feature that takes you one song further from what you love."
     },
     {
       "section": "thoughts",

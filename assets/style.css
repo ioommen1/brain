@@ -606,3 +606,14 @@ a, button, .nav a, .row .r-title, .i-title, .filters button { transition: color 
 .brand:hover { color: var(--fg) !important; }
 @media (min-width: 1000px) { .brand { padding-left: 14px; } .site-header { gap: 18px; } }
 @media (max-width: 999px) { .brand { font-size: 14px !important; } }
+
+/* Captions: title, then what it does */
+.frame.done .cap { display: block; height: auto; white-space: normal; margin-top: 12px; }
+.frame.done .cap .ct { display: block; color: var(--fg); }
+.frame.done .cap em { display: block; color: var(--muted); margin-top: 2px; }
+/* Sidebar sits lower, with more room before the content */
+@media (min-width: 1000px) {
+  .site-header { padding-top: 120px; left: max(0px, calc((100vw - 960px) / 2 - 300px)); }
+  .wrap { margin-left: max(320px, calc((100vw - 960px) / 2)); max-width: min(960px, calc(100vw - 360px)); }
+  main { padding-top: 112px; }
+}
