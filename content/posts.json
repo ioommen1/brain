@@ -1,9 +1,8 @@
 {
   "site": {
-    "headline": "I think about <em>products</em>, <em>markets</em>, and the space where they meet.",
+    "headline": "Hi, I'm Isaac.",
     "intro": [
-      "Hi, I'm Isaac. This is where I write down product ideas, half-formed thoughts, and investment memos so I can see whether they hold up.",
-      "Most of it is a work in progress. If something here sparks an idea, <a href=\"#/about\">reach out</a>."
+      "I write down product ideas, half-formed thoughts, and investment memos here so I can see whether they hold up. Most of it is a work in progress. If something sparks an idea, <a href=\"#/about\">reach out</a>."
     ]
   },
   "posts": [
@@ -13,9 +12,15 @@
       "title": "Receipts for Everything",
       "date": "2026-11-10",
       "status": "Exploring",
-      "tags": ["Consumer", "Fintech"],
+      "tags": [
+        "Consumer",
+        "Fintech"
+      ],
       "readTime": "5 min read",
-      "summary": "A single inbox that turns every purchase into a structured, searchable record for warranties, returns, and budgeting."
+      "summary": "A single inbox that turns every purchase into a structured, searchable record for warranties, returns, and budgeting.",
+      "subtitle": "Concept · Consumer fintech",
+      "mark": "Every receipt, one place.",
+      "palette": 0
     },
     {
       "section": "concepts",
@@ -23,16 +28,25 @@
       "title": "An AI Chief of Staff for Small Teams",
       "date": "2026-10-02",
       "status": "Sketch",
-      "tags": ["AI", "B2B"],
+      "tags": [
+        "AI",
+        "B2B"
+      ],
       "readTime": "6 min read",
-      "summary": "What if a 10-person company had the operating rhythm of a 1,000-person one, without hiring an ops team?"
+      "summary": "What if a 10-person company had the operating rhythm of a 1,000-person one, without hiring an ops team?",
+      "subtitle": "Concept · AI for small teams",
+      "mark": "Ops for a team of ten.",
+      "palette": 1
     },
     {
       "section": "thoughts",
       "slug": "distribution-is-the-moat",
       "title": "In AI, Distribution Is the Moat (For Now)",
       "date": "2026-11-18",
-      "tags": ["AI", "Strategy"],
+      "tags": [
+        "AI",
+        "Strategy"
+      ],
       "readTime": "3 min read",
       "summary": "When models commoditize, the winners are the ones who already own the workflow."
     },
@@ -41,7 +55,9 @@
       "slug": "writing-to-think",
       "title": "Writing to Think",
       "date": "2026-09-14",
-      "tags": ["Meta"],
+      "tags": [
+        "Meta"
+      ],
       "readTime": "2 min read",
       "summary": "Why I publish half-finished ideas, and what I hope to get out of it."
     },
@@ -51,7 +67,10 @@
       "title": "Sample Memo: A Vertical SaaS Roll-Up",
       "date": "2026-11-01",
       "ticker": "Template",
-      "tags": ["Software", "Private"],
+      "tags": [
+        "Software",
+        "Private"
+      ],
       "readTime": "8 min read",
       "summary": "A worked template for how I structure an investment memo: thesis, market, unit economics, risks, and valuation.",
       "memo": {
@@ -59,7 +78,10 @@
         "Type": "Private / Hypothetical",
         "Horizon": "3 to 5 years",
         "Conviction": "Medium"
-      }
+      },
+      "subtitle": "Memo template · Long, 3 to 5 years",
+      "mark": "Vertical SaaS roll-up",
+      "palette": 5
     }
   ]
 }
