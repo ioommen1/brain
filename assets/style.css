@@ -258,3 +258,22 @@ main > * { animation: fade .35s ease both; }
 .page .ab { font-size: 9px; font-weight: 700; letter-spacing: .08em; margin-bottom: 6px; }
 .page .ln { height: 5px; background: #e6e6e6; border-radius: 3px; margin: 0 auto 6px; }
 @media (max-width: 640px) { .rack-paper { grid-template-columns: 1fr; } }
+
+/* ---------- Loupe cursor ---------- */
+.has-loupe, .has-loupe * { cursor: none !important; }
+.loupe-dot, .loupe-ring { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
+.loupe-dot { width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--accent); transition: opacity .2s; }
+.loupe-dot.hide { opacity: 0; }
+.loupe-ring { width: 0; height: 0; }
+.loupe-ring span {
+  position: absolute; left: 0; top: 0; width: 30px; height: 30px; transform: translate(-50%, -50%);
+  border: 1.5px solid color-mix(in srgb, var(--accent) 55%, transparent); border-radius: 50%;
+  display: grid; place-items: center; font: 500 0px/1 var(--sans); color: var(--on-accent); letter-spacing: .02em;
+  transition: width .3s cubic-bezier(.2,.8,.2,1), height .3s cubic-bezier(.2,.8,.2,1), background .25s, border-color .25s, font-size .2s;
+}
+.loupe-ring.link span { width: 42px; height: 42px; border-color: var(--accent); }
+.loupe-ring.lens span { width: 66px; height: 66px; background: var(--accent); border-color: var(--accent); font-size: 13px;
+  box-shadow: 0 0 0 1.5px rgba(255,255,255,.75), 0 8px 24px -10px rgba(120,50,15,.55); }
+.loupe-ring.press span { width: 24px; height: 24px; }
+.loupe-ring.lens.press span { width: 58px; height: 58px; }
+.loupe-out .loupe-dot, .loupe-out .loupe-ring { opacity: 0; }
