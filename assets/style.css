@@ -897,3 +897,12 @@ div.dk-row { grid-template-columns: 26px minmax(0, 1fr) 40px; }
 @media (max-width: 720px) { .dk-coach { font-size: 11.5px; } }
 .dk-row.dk-arow { grid-template-columns: 26px minmax(0, 1fr) 40px; }
 @media (max-width: 720px) { .dk-row.dk-arow { grid-template-columns: 22px minmax(0, 1fr) 36px; } }
+/* Rabbit hole button lives with the playing song */
+.dk-now { position: relative; }
+.dk-rhbtn { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: var(--t2); flex: none; }
+.dk-rhbtn .ic { width: 18px; height: 18px; }
+.dk-rhbtn:hover { color: #fff; }
+.dk-rhbtn.on { color: var(--g); }
+.dk-rhbtn.hint { color: #fff; } .dk-rhbtn.hint::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid var(--g); animation: ring 1.8s ease-out infinite; }
+.dk-now .dk-coach { position: absolute; left: 0; bottom: calc(100% + 14px); margin: 0; white-space: nowrap; z-index: 4; }
+.dk-now .dk-coach::before { left: var(--ax, 140px); top: auto; bottom: -5px; margin: 0; }

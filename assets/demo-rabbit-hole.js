@@ -91,8 +91,7 @@
              <div class="dk-hero-txt"><small>Album</small><div class="dk-title">${esc(START.title)}</div><span>${esc(START.artist)} · 2024 · 4 songs</span></div>
            </div>
            <div class="dk-bar"><button type="button" class="dk-bigplay" aria-label="${playing ? "Pause" : "Play"}">${ic(playing ? "pause" : "play", "", !playing)}</button>
-             <button type="button" class="dk-ib dk-more2${coached ? "" : " hint"}" aria-label="More options for ${esc(START.title)}">${ic("more", "", true)}</button>
-             ${coached ? "" : `<span class="dk-coach" role="note"><b>New</b>Go down the rabbit hole from any song</span>`}</div>
+</div>
            <div class="dk-table">${ALBUM.map((x, i) => `<button type="button" class="dk-row dk-arow${x.title === cur.title ? " on" : ""}" data-a="${i}"><span class="n">${x.title === cur.title && playing ? '<i class="eq"><b></b><b></b><b></b></i>' : i + 1}</span>
                <span class="t"><b>${esc(x.title)}</b><small>${esc(x.artist)}</small></span><span class="d">${dur(x.title)}</span></button>`).join("")}</div>`;
 
@@ -109,7 +108,9 @@
           </div>
         </div>
         <div class="dk-player">
-          <div class="dk-now">${art(cur, "sm")}<span><b>${esc(cur.title)}</b><small>${esc(cur.artist)}</small></span></div>
+          <div class="dk-now">${art(cur, "sm")}<span><b>${esc(cur.title)}</b><small>${esc(cur.artist)}</small></span>
+            <button type="button" class="dk-ib dk-rhbtn${rh ? " on" : coached ? "" : " hint"}" aria-label="${rh ? "In a rabbit hole" : "Go down the rabbit hole from this song"}" title="Go down the rabbit hole">${ic("hole")}</button>
+            ${!rh && !coached ? `<span class="dk-coach" role="note"><b>New</b>Go down the rabbit hole from this song</span>` : ""}</div>
           <div class="dk-ctrl">
             <div class="dk-btns">
               <button type="button" class="dk-ib dk-shuf${shuffle ? " on" : ""}" aria-label="Shuffle">${ic("shuffle")}</button>
@@ -140,7 +141,13 @@
         menuAt = { x, y }; menu = true; coached = true; render();
       };
       $(".dk-more").addEventListener("click", (e) => menu ? (menu = false, render()) : openMenu(e, e.currentTarget));
-      const m2 = $(".dk-more2"); if (m2) m2.addEventListener("click", (e) => menu ? (menu = false, render()) : openMenu(e, e.currentTarget));
+      const cc = $(".dk-now .dk-coach"), rb = $(".dk-rhbtn");
+      if (cc && rb) cc.style.setProperty("--ax", (rb.getBoundingClientRect().left + rb.offsetWidth / 2 - cc.getBoundingClientRect().left - 5) + "px");
+      $(".dk-rhbtn").addEventListener("click", () => {
+        coached = true; menu = false;
+        if (mode === "rabbit") return flash("You're in a rabbit hole. Press next to go one step further.");
+        mode = "rabbit"; pos = 0; trail = [trail[trail.length - 1]]; seen.clear(); seen.add(trail[0].title); saved = false; playing = true; flash("Rabbit hole started. Press next.");
+      });
       el.querySelectorAll(".dk-row").forEach((r) => r.addEventListener("contextmenu", (e) => openMenu(e, null)));
       el.querySelectorAll(".dk-mi:not(.dk-new)").forEach((b) => b.addEventListener("click", () => { menu = false; render(); }));
       const nw = $(".dk-new"); if (nw) nw.addEventListener("click", () => {
